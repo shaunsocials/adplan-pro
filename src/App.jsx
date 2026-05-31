@@ -556,7 +556,7 @@ export default function MetaAdsMVP() {
     }, 900);
 
     try {
-      const response = await fetch("/.netlify/functions/generate", {
+      const response = await fetch("https://adplan-api-production.up.railway.app/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
