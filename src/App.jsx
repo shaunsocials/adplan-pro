@@ -566,8 +566,7 @@ export default function MetaAdsMVP() {
       const data = await response.json();
       const text = data.content?.find(b => b.type === "text")?.text || "";
 console.log("Raw response:", text.slice(0, 300));
-const clean = text.replace(/```json|```/g, "").trim();
-let parsed;
+const clean = text.replace(/```json\n?|```\n?/g, "").trim();let parsed;
 try {
   parsed = JSON.parse(clean);
 } catch(parseErr) {
