@@ -8,14 +8,11 @@ exports.handler = async function(event, context) {
     const apiKey = process.env.ANTHROPIC_API_KEY;
 
     if (!apiKey) {
-      console.log("ERROR: No API key found");
       return {
         statusCode: 500,
         body: JSON.stringify({ error: "API key not configured" })
       };
     }
-
-    console.log("API key found, length:", apiKey.length);
 
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
@@ -25,15 +22,13 @@ exports.handler = async function(event, context) {
         "anthropic-version": "2023-06-01",
       },
       body: JSON.stringify({
-        model: "claude-sonnet-4-5",
-        max_tokens: 1500,
+        model: "claude-haiku-4-5",
+        max_tokens: 2000,
         messages: body.messages,
       }),
     });
 
-    console.log("Anthropic response status:", response.status);
     const data = await response.json();
-    console.log("Anthropic response:", JSON.stringify(data).slice(0, 200));
 
     return {
       statusCode: 200,
@@ -44,7 +39,6 @@ exports.handler = async function(event, context) {
       body: JSON.stringify(data),
     };
   } catch (err) {
-    console.log("CATCH ERROR:", err.message);
     return {
       statusCode: 500,
       headers: { "Content-Type": "application/json" },
