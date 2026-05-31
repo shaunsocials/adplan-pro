@@ -556,7 +556,7 @@ export default function MetaAdsMVP() {
     }, 900);
 
     try {
-      const response = await fetch("/api/generate", {
+      const response = await fetch("/.netlify/functions/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
