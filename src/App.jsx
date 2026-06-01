@@ -449,6 +449,22 @@ export default function AdPlanPro() {
     "Campaign plan ready",
   ];
 
+  const META_TIPS = [
+    { label: "The 50-event rule", tip: "Meta's algorithm needs 50 conversion events per week to exit the Learning Phase. If your budget can't deliver that, optimise for a higher-funnel event — like Lead instead of Purchase — to give the algorithm enough signal." },
+    { label: "Why broad targeting works at scale", tip: "Advantage+ broad targeting outperforms interest stacking — but only above ~$100/day. Below that, your budget gets diluted across too many user types before the algorithm finds its feet. Interest stacking concentrates your signal." },
+    { label: "The first 3 seconds are everything", tip: "On Meta, 65% of people who watch 3 seconds will watch 10. Your hook isn't the first line — it's the first frame. Pattern interrupt, bold text overlay, or direct address before you say a word." },
+    { label: "CPM is your canary", tip: "A rising CPM usually means your creative has fatigued or your audience is too small. A high CPM from day one usually means your creative isn't stopping the scroll. Low CTR + high CPM = creative problem, not targeting problem." },
+    { label: "Never touch a learning ad set", tip: "Every significant edit — budget change over 20%, audience edit, creative swap — resets the Learning Phase. Let new ad sets run untouched for at least 5-7 days unless they're spending nothing at all." },
+    { label: "The real job of an ad", tip: "Your ad doesn't need to sell. It needs to qualify and click. The landing page sells. Ads that try to do both usually do neither — they're too long, too detailed, and too slow to hook a cold audience." },
+    { label: "Mobile first, always", tip: "Over 80% of Meta ad impressions are on mobile. Design your creative vertically (9:16), keep your copy under 125 characters before the 'See more' cutoff, and test your landing page on a real phone before spending a cent." },
+    { label: "Retargeting is cheap and ignored", tip: "Website visitors who've seen your brand convert at 3-5x the rate of cold traffic — but most small advertisers never set it up. A simple retargeting ad set with a $5/day budget will outperform most cold campaigns dollar-for-dollar." },
+    { label: "Social proof beats claims", tip: "'Trusted by 500+ clients' outperforms 'The best cleaning service in Austin'. Specificity and proof convert. If you don't have testimonials yet, a before/after, a result stat, or even a Google review screenshot will beat any clever headline." },
+    { label: "Kill fast, scale slow", tip: "Kill underperforming ad sets after they've spent 2-3x your target CPA with no conversions. But scale winners slowly — increase budget by 20% every 2-3 days. Jumping budget resets learning and often tanks performance." },
+  ];
+
+  const [tipIndex, setTipIndex] = useState(0);
+  const [tipVisible, setTipVisible] = useState(true);
+
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
   const STEPS = [
@@ -506,6 +522,18 @@ export default function AdPlanPro() {
     return () => el.remove();
   }, []);
 
+  useEffect(() => {
+    if (page !== "loading") return;
+    const interval = setInterval(() => {
+      setTipVisible(false);
+      setTimeout(() => {
+        setTipIndex(i => (i + 1) % META_TIPS.length);
+        setTipVisible(true);
+      }, 400);
+    }, 6000);
+    return () => clearInterval(interval);
+  }, [page]);
+
   const resetAll = () => {
     setPage("home"); setStep(0); setResult(null);
     setForm({ offerType: "", businessName: "", offerDesc: "", budget: "", pricePoint: "", location: "", targetAudience: "", funnelStage: "", existingAssets: "", goal: "" });
@@ -515,7 +543,7 @@ export default function AdPlanPro() {
   if (page === "home") return (
     <div className="app">
       <nav className="nav">
-        <div className="nav-logo"><div className="nav-logo-dot"/> AdPlan Pro <span className="nav-pill">Beta</span></div>
+        <div className="nav-logo"><div className="nav-logo-dot"/> MetPlan <span className="nav-pill">Beta</span></div>
         <div className="nav-tabs">
           <button className="nav-tab active">Build Campaign</button>
           <button className="nav-tab" onClick={() => setPage("setup")}>Account Setup</button>
@@ -565,7 +593,7 @@ export default function AdPlanPro() {
   if (page === "setup") return (
     <div className="app">
       <nav className="nav">
-        <div className="nav-logo"><div className="nav-logo-dot"/> AdPlan Pro <span className="nav-pill">Beta</span></div>
+        <div className="nav-logo"><div className="nav-logo-dot"/> MetPlan <span className="nav-pill">Beta</span></div>
         <div className="nav-tabs">
           <button className="nav-tab" onClick={() => setPage("home")}>Build Campaign</button>
           <button className="nav-tab active">Account Setup</button>
@@ -602,7 +630,7 @@ export default function AdPlanPro() {
   if (page === "wizard") return (
     <div className="app">
       <nav className="nav">
-        <div className="nav-logo"><div className="nav-logo-dot"/> AdPlan Pro <span className="nav-pill">Beta</span></div>
+        <div className="nav-logo"><div className="nav-logo-dot"/> MetPlan <span className="nav-pill">Beta</span></div>
         <div className="nav-tabs">
           <button className="nav-tab" onClick={resetAll}>Home</button>
           <button className="nav-tab" onClick={() => setPage("setup")}>Account Setup</button>
@@ -726,14 +754,20 @@ export default function AdPlanPro() {
   if (page === "loading") return (
     <div className="app">
       <nav className="nav">
-        <div className="nav-logo"><div className="nav-logo-dot"/> AdPlan Pro <span className="nav-pill">Beta</span></div>
+        <div className="nav-logo"><div className="nav-logo-dot"/> MetPlan <span className="nav-pill">Beta</span></div>
       </nav>
-      <div className="loading-screen">
-        <div className="loader-ring" />
-        <div className="loading-title">Building your campaign plan...</div>
-        <div className="loading-subtitle">Analysing your offer, budget, and audience against current Meta best practices.</div>
-        <div className="loading-warning">Please do not refresh or close this page</div>
-        <div className="loading-steps">
+      <div style={{ maxWidth: 680, margin: "0 auto", padding: "64px 48px 80px" }}>
+
+        {/* Top: spinner + title */}
+        <div style={{ textAlign: "center", marginBottom: 48 }}>
+          <div className="loader-ring" />
+          <div className="loading-title">Building your campaign plan...</div>
+          <div className="loading-subtitle">This takes 20–40 seconds. We're generating a fully tailored strategy, not a template.</div>
+          <div className="loading-warning">Please do not refresh or close this page</div>
+        </div>
+
+        {/* Progress steps */}
+        <div className="loading-steps" style={{ marginBottom: 48 }}>
           {loadingSteps.map((s, i) => (
             <div key={i} className={`loading-step ${i <= loadingStep ? "done" : ""}`} style={{ animationDelay: `${i * 0.15}s` }}>
               <div className="ls-check">{i <= loadingStep ? "✓" : ""}</div>
@@ -741,6 +775,44 @@ export default function AdPlanPro() {
             </div>
           ))}
         </div>
+
+        {/* Rotating tip card */}
+        <div style={{
+          background: "var(--surface)", border: "1px solid var(--border)",
+          borderRadius: 12, padding: "24px 28px",
+          opacity: tipVisible ? 1 : 0,
+          transform: tipVisible ? "translateY(0)" : "translateY(6px)",
+          transition: "opacity 0.4s ease, transform 0.4s ease",
+        }}>
+          <div style={{
+            fontSize: 10, fontWeight: 700, letterSpacing: "0.12em",
+            textTransform: "uppercase", color: "var(--accent)",
+            marginBottom: 10,
+          }}>
+            While you wait — Meta Ads tip
+          </div>
+          <div style={{
+            fontSize: 15, fontWeight: 700, marginBottom: 8,
+            letterSpacing: "-0.01em", color: "var(--text)",
+            fontFamily: "Playfair Display, serif",
+          }}>
+            {META_TIPS[tipIndex].label}
+          </div>
+          <div style={{ fontSize: 14, color: "var(--muted2)", lineHeight: 1.7 }}>
+            {META_TIPS[tipIndex].tip}
+          </div>
+          <div style={{ marginTop: 16, display: "flex", gap: 6 }}>
+            {META_TIPS.map((_, i) => (
+              <div key={i} style={{
+                width: i === tipIndex ? 20 : 6, height: 6,
+                borderRadius: 3,
+                background: i === tipIndex ? "var(--accent)" : "var(--border)",
+                transition: "all 0.3s ease",
+              }} />
+            ))}
+          </div>
+        </div>
+
       </div>
     </div>
   );
@@ -749,7 +821,7 @@ export default function AdPlanPro() {
   if (page === "results") {
     if (!result || result.error) return (
       <div className="app">
-        <nav className="nav"><div className="nav-logo"><div className="nav-logo-dot"/> AdPlan Pro</div></nav>
+        <nav className="nav"><div className="nav-logo"><div className="nav-logo-dot"/> MetPlan</div></nav>
         <div style={{ textAlign: "center", padding: "80px 40px" }}>
           <div style={{ width: 48, height: 48, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" }}>
             <Icon name="alert" />
@@ -775,7 +847,7 @@ export default function AdPlanPro() {
     return (
       <div className="app">
         <nav className="nav">
-          <div className="nav-logo"><div className="nav-logo-dot"/> AdPlan Pro <span className="nav-pill">Beta</span></div>
+          <div className="nav-logo"><div className="nav-logo-dot"/> MetPlan <span className="nav-pill">Beta</span></div>
           <div className="nav-tabs">
             <button className="nav-tab" onClick={resetAll}>New Campaign</button>
             <button className="nav-tab" onClick={() => setPage("setup")}>Account Setup</button>
