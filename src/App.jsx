@@ -500,10 +500,11 @@ export default function AdPlanPro() {
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
   const STEPS = [
-    { label: "Step 1 of 4", title: "Tell us about your offer", desc: "This shapes everything — campaign type, targeting, and creative direction." },
-    { label: "Step 2 of 4", title: "Budget and pricing", desc: "Be honest here. We'll build a realistic plan for what you actually have." },
-    { label: "Step 3 of 4", title: "Your audience", desc: "Who actually buys this, and where are they?" },
-    { label: "Step 4 of 4", title: "Context and goals", desc: "A few final details to make your plan as specific as possible." },
+    { label: "Step 1 of 5", title: "Tell us about your offer", desc: "This shapes everything — campaign type, targeting, and creative direction." },
+    { label: "Step 2 of 5", title: "Budget and pricing", desc: "Be honest here. We'll build a realistic plan for what you actually have." },
+    { label: "Step 3 of 5", title: "Your audience", desc: "Who actually buys this, and where are they?" },
+    { label: "Step 4 of 5", title: "Context and goals", desc: "A few final details to make your plan as specific as possible." },
+    { label: "Step 5 of 5", title: "Complete your order", desc: "One campaign plan, tailored to your exact offer and budget." },
   ];
 
   const canNext = [
@@ -511,9 +512,11 @@ export default function AdPlanPro() {
     form.budget && form.pricePoint,
     form.targetAudience && form.funnelStage,
     true,
+    false,
   ][step];
 
-  async function generate() {
+  async function generate(formOverride) {
+    const activeForm = formOverride || form;
     setPage("loading");
     setLoadingStep(0);
     const interval = setInterval(() => {
@@ -525,7 +528,7 @@ export default function AdPlanPro() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          messages: [{ role: "user", content: buildPrompt(form) }],
+          messages: [{ role: "user", content: buildPrompt(activeForm) }],
         }),
       });
       const data = await response.json();
@@ -551,7 +554,31 @@ export default function AdPlanPro() {
     const el = document.createElement("style");
     el.textContent = css;
     document.head.appendChild(el);
+    // Load GHL embed script
+    if (!document.querySelector('script[src="https://link.msgsndr.com/js/form_embed.js"]')) {
+      const script = document.createElement("script");
+      script.src = "https://link.msgsndr.com/js/form_embed.js";
+      document.body.appendChild(script);
+    }
     return () => el.remove();
+  }, []);
+
+  useEffect(() => {
+    // Check if returning from GHL payment
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("paid") === "true") {
+      // Clean the URL
+      window.history.replaceState({}, "", window.location.pathname);
+      // Restore form from localStorage
+      const saved = localStorage.getItem("metplan_form");
+      if (saved) {
+        const savedForm = JSON.parse(saved);
+        setForm(savedForm);
+        localStorage.removeItem("metplan_form");
+        // Small delay to let state settle then generate
+        setTimeout(() => generate(savedForm), 100);
+      }
+    }
   }, []);
 
   useEffect(() => {
@@ -672,7 +699,7 @@ export default function AdPlanPro() {
       </nav>
       <div className="wizard-wrap" style={{ paddingTop: 48 }}>
         <div className="step-indicator">
-          {[0,1,2,3].map((i) => (
+          {[0,1,2,3,4].map((i) => (
             <div key={i} style={{ display: "contents" }}>
               <div className={`step-dot ${i < step ? "done" : i === step ? "active" : ""}`}>
                 {i < step ? <Icon name="check" /> : i + 1}
@@ -772,12 +799,52 @@ export default function AdPlanPro() {
             </div>
           </>}
 
+          {step === 4 && <>
+            <div style={{ marginBottom: 24 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px 0", borderBottom: "1px solid var(--border)" }}>
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: "var(--text)" }}>Meta Ads Campaign Plan</div>
+                  <div style={{ fontSize: 12, color: "var(--muted2)", marginTop: 3 }}>Full strategy for {form.businessName} · ${form.budget}/mo budget</div>
+                </div>
+                <div style={{ fontSize: 20, fontWeight: 800, color: "var(--accent)", fontFamily: "Playfair Display, serif" }}>$5</div>
+              </div>
+            </div>
+            <div style={{ borderRadius: 10, overflow: "hidden", background: "var(--bg)", minHeight: 1120 }}>
+              <iframe
+                src="https://api.leadconnectorhq.com/widget/form/qj26frfXrz5EVPGSZ9GL"
+                style={{ width: "100%", height: "800px", border: "none", borderRadius: 8 }}
+                id="inline-qj26frfXrz5EVPGSZ9GL"
+                data-layout="{'id':'INLINE'}"
+                data-trigger-type="alwaysShow"
+                data-trigger-value=""
+                data-activation-type="alwaysActivated"
+                data-activation-value=""
+                data-deactivation-type="neverDeactivate"
+                data-deactivation-value=""
+                data-form-name="MetPlan Order Form"
+                data-height="undefined"
+                data-layout-iframe-id="inline-qj26frfXrz5EVPGSZ9GL"
+                data-form-id="qj26frfXrz5EVPGSZ9GL"
+                title="MetPlan Order Form"
+              />
+            </div>
+            <div style={{ marginTop: 12, textAlign: "center", fontSize: 12, color: "var(--muted)" }}>
+              Secured by Stripe · All sales final · Plan generates immediately after payment
+            </div>
+            <div style={{ marginTop: 16 }}>
+              <button className="btn btn-ghost" style={{ fontSize: 13 }} onClick={() => setStep(3)}>← Back to edit details</button>
+            </div>
+          </>}
+
           <div className="btn-row" style={{ marginTop: 28 }}>
-            {step > 0 && <button className="btn btn-ghost" onClick={() => setStep(s => s - 1)}>Back</button>}
-            {step < 3
-              ? <button className="btn btn-primary" disabled={!canNext} onClick={() => setStep(s => s + 1)}>Continue</button>
-              : <button className="btn btn-primary" style={{ flex: 1, justifyContent: "center" }} onClick={generate}>Generate Campaign Plan</button>
-            }
+            {step > 0 && step !== 4 && <button className="btn btn-ghost" onClick={() => setStep(s => s - 1)}>Back</button>}
+            {step < 4 && <button className="btn btn-primary" disabled={!canNext} onClick={() => {
+              if (step === 3) {
+                // Save form before going to payment step
+                localStorage.setItem("metplan_form", JSON.stringify(form));
+              }
+              setStep(s => s + 1);
+            }}>Continue</button>}
           </div>
         </div>
       </div>
