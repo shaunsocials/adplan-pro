@@ -1,443 +1,360 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 
-// ─── THEME ───────────────────────────────────────────────────────────────────
 const css = `
-  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700;800&display=swap');
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --bg: #0a0a0f;
-    --surface: #13131a;
-    --surface2: #1c1c26;
-    --border: #2a2a3a;
-    --accent: #ff5c35;
-    --accent2: #ff8c35;
-    --blue: #4f8ef7;
-    --text: #f0f0f5;
-    --muted: #7070a0;
-    --success: #2ecc71;
+    --bg: #080e0a;
+    --surface: #0e1610;
+    --surface2: #131f15;
+    --border: #1e2e20;
+    --accent: #c9a84c;
+    --text: #f2ede4;
+    --muted: #4a5e4c;
+    --muted2: #8a9e8c;
+    --success: #4caf72;
+    --warning: #c9a84c;
   }
 
-  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; }
+  body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
 
-  .app {
-    min-height: 100vh;
-    background: var(--bg);
-    position: relative;
-    overflow-x: hidden;
-  }
+  .app { min-height: 100vh; background: var(--bg); overflow-x: hidden; }
 
   /* NAV */
   .nav {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 20px 40px;
+    padding: 18px 48px;
     border-bottom: 1px solid var(--border);
-    background: rgba(10,10,15,0.9);
-    backdrop-filter: blur(12px);
+    background: rgba(12,12,14,0.95);
+    backdrop-filter: blur(16px);
     position: sticky; top: 0; z-index: 100;
   }
   .nav-logo {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800; font-size: 20px;
-    display: flex; align-items: center; gap: 8px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700; font-size: 17px; letter-spacing: -0.02em;
+    display: flex; align-items: center; gap: 10px;
   }
-  .nav-logo span { color: var(--accent); }
+  .nav-logo-dot { width: 8px; height: 8px; border-radius: 50%; background: linear-gradient(135deg, #c9a84c, #e8cc7a); }
   .nav-pill {
-    background: var(--accent);
-    color: white; font-size: 11px; font-weight: 600;
-    padding: 3px 8px; border-radius: 20px; letter-spacing: 0.05em;
+    background: rgba(201,168,76,0.1);
+    color: var(--accent); font-size: 10px; font-weight: 600;
+    padding: 3px 8px; border-radius: 4px; letter-spacing: 0.08em;
+    text-transform: uppercase; border: 1px solid rgba(201,168,76,0.2);
   }
-  .nav-tabs { display: flex; gap: 4px; }
+  .nav-tabs { display: flex; gap: 2px; }
   .nav-tab {
     background: none; border: none; cursor: pointer;
-    color: var(--muted); font-family: 'DM Sans', sans-serif;
-    font-size: 14px; padding: 8px 16px; border-radius: 8px;
-    transition: all 0.2s;
+    color: var(--muted2); font-family: 'Inter', sans-serif;
+    font-size: 14px; font-weight: 500;
+    padding: 7px 14px; border-radius: 6px;
+    transition: all 0.15s;
   }
-  .nav-tab:hover { color: var(--text); background: var(--surface); }
+  .nav-tab:hover { color: var(--text); background: var(--surface2); }
   .nav-tab.active { color: var(--text); background: var(--surface2); }
 
   /* HERO */
-  .hero {
-    padding: 80px 40px 60px;
-    max-width: 860px; margin: 0 auto;
-    text-align: center;
-  }
+  .hero { padding: 88px 48px 72px; max-width: 880px; margin: 0 auto; text-align: center; }
   .hero-eyebrow {
-    display: inline-block;
-    font-size: 12px; font-weight: 600; letter-spacing: 0.15em;
-    text-transform: uppercase; color: var(--accent);
-    border: 1px solid rgba(255,92,53,0.3);
-    padding: 6px 14px; border-radius: 20px;
-    margin-bottom: 28px;
+    display: inline-block; font-size: 11px; font-weight: 600;
+    letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent);
+    margin-bottom: 32px;
   }
   .hero h1 {
-    font-family: 'Syne', sans-serif;
-    font-size: clamp(36px, 6vw, 64px);
-    font-weight: 800; line-height: 1.05;
-    margin-bottom: 20px;
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(38px, 5.5vw, 62px);
+    font-weight: 800; line-height: 1.08; letter-spacing: -0.02em;
+    margin-bottom: 22px;
   }
-  .hero h1 em { font-style: normal; color: var(--accent); }
-  .hero p {
-    font-size: 18px; color: var(--muted); line-height: 1.7;
-    max-width: 560px; margin: 0 auto 40px;
-  }
+  .hero h1 em { font-style: italic; color: var(--accent); }
+  .hero p { font-size: 17px; color: var(--muted2); line-height: 1.75; max-width: 520px; margin: 0 auto 44px; font-weight: 400; }
   .hero-price {
-    display: inline-flex; align-items: center; gap: 10px;
+    display: inline-flex; align-items: center; gap: 12px;
     background: var(--surface); border: 1px solid var(--border);
-    border-radius: 12px; padding: 12px 20px;
-    font-size: 14px; color: var(--muted);
+    border-radius: 10px; padding: 13px 22px; font-size: 14px; color: var(--muted2);
   }
-  .hero-price strong { color: var(--text); font-size: 16px; }
+  .hero-price strong { color: var(--text); font-size: 15px; font-weight: 600; }
   .price-badge {
-    background: rgba(255,92,53,0.15);
-    color: var(--accent); font-size: 11px; font-weight: 700;
-    padding: 3px 8px; border-radius: 6px; letter-spacing: 0.05em;
+    background: rgba(201,168,76,0.1); color: var(--accent);
+    font-size: 10px; font-weight: 700; padding: 3px 8px;
+    border-radius: 4px; letter-spacing: 0.08em; text-transform: uppercase;
   }
 
   /* WIZARD */
-  .wizard-wrap { max-width: 720px; margin: 0 auto; padding: 0 40px 80px; }
+  .wizard-wrap { max-width: 680px; margin: 0 auto; padding: 0 48px 100px; }
 
-  .step-indicator {
-    display: flex; align-items: center; gap: 0;
-    margin-bottom: 48px;
-  }
+  .step-indicator { display: flex; align-items: center; margin-bottom: 44px; }
   .step-dot {
-    width: 32px; height: 32px; border-radius: 50%;
+    width: 28px; height: 28px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    font-size: 12px; font-weight: 700; font-family: 'Syne', sans-serif;
-    border: 2px solid var(--border);
+    font-size: 11px; font-weight: 700;
+    border: 1.5px solid var(--border);
     color: var(--muted); background: var(--surface);
-    transition: all 0.3s; flex-shrink: 0;
+    transition: all 0.25s; flex-shrink: 0;
   }
   .step-dot.done { background: var(--accent); border-color: var(--accent); color: white; }
-  .step-dot.active { border-color: var(--accent); color: var(--accent); background: rgba(255,92,53,0.1); }
-  .step-line { flex: 1; height: 2px; background: var(--border); transition: all 0.3s; }
-  .step-line.done { background: var(--accent); }
+  .step-dot.active { border-color: var(--accent); color: var(--accent); background: rgba(201,168,76,0.08); }
+  .step-line { flex: 1; height: 1px; background: var(--border); transition: all 0.25s; }
+  .step-line.done { background: var(--accent); opacity: 0.4; }
 
   .step-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 40px;
-    animation: slideUp 0.4s ease;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 40px;
+    animation: fadeUp 0.3s ease;
   }
-  @keyframes slideUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 
-  .step-label {
-    font-size: 11px; font-weight: 700; letter-spacing: 0.15em;
-    text-transform: uppercase; color: var(--accent); margin-bottom: 8px;
-  }
-  .step-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 26px; font-weight: 700;
-    margin-bottom: 8px; line-height: 1.2;
-  }
-  .step-desc { color: var(--muted); font-size: 15px; margin-bottom: 32px; line-height: 1.6; }
+  .step-label { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+  .step-title { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; margin-bottom: 8px; line-height: 1.25; }
+  .step-desc { color: var(--muted2); font-size: 14px; margin-bottom: 32px; line-height: 1.65; }
 
   /* FIELDS */
-  .field-group { display: grid; gap: 16px; margin-bottom: 32px; }
+  .field-group { display: grid; gap: 16px; margin-bottom: 28px; }
   .field-group.cols2 { grid-template-columns: 1fr 1fr; }
-  .field { display: flex; flex-direction: column; gap: 8px; }
-  .field label { font-size: 13px; font-weight: 500; color: var(--muted); }
+  .field { display: flex; flex-direction: column; gap: 7px; }
+  .field label { font-size: 12px; font-weight: 600; color: var(--muted2); letter-spacing: 0.02em; }
   .field input, .field select, .field textarea {
     background: var(--bg); border: 1px solid var(--border);
-    border-radius: 10px; padding: 12px 16px;
-    color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 15px;
-    transition: border-color 0.2s;
-    width: 100%;
+    border-radius: 8px; padding: 11px 14px;
+    color: var(--text); font-family: 'Inter', sans-serif; font-size: 14px;
+    transition: border-color 0.15s; width: 100%;
   }
   .field input:focus, .field select:focus, .field textarea:focus {
     outline: none; border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(255,92,53,0.1);
+    box-shadow: 0 0 0 3px rgba(201,168,76,0.08);
   }
-  .field textarea { resize: vertical; min-height: 90px; }
-  .field select option { background: #1c1c26; }
+  .field textarea { resize: vertical; min-height: 88px; line-height: 1.6; }
+  .field select option { background: #1a1a1e; }
 
   /* OPTION CARDS */
-  .option-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 32px; }
+  .option-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 28px; }
   .option-grid.cols3 { grid-template-columns: repeat(3, 1fr); }
   .option-card {
-    background: var(--bg); border: 2px solid var(--border);
-    border-radius: 12px; padding: 16px;
-    cursor: pointer; transition: all 0.2s; text-align: left;
+    background: var(--bg); border: 1.5px solid var(--border);
+    border-radius: 10px; padding: 16px;
+    cursor: pointer; transition: all 0.15s; text-align: left;
   }
-  .option-card:hover { border-color: rgba(255,92,53,0.4); background: rgba(255,92,53,0.04); }
-  .option-card.selected { border-color: var(--accent); background: rgba(255,92,53,0.08); }
-  .option-card-icon { font-size: 24px; margin-bottom: 8px; }
-  .option-card-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; margin-bottom: 4px; }
-  .option-card-desc { font-size: 12px; color: var(--muted); line-height: 1.4; }
+  .option-card:hover { border-color: rgba(201,168,76,0.35); background: rgba(201,168,76,0.03); }
+  .option-card.selected { border-color: var(--accent); background: rgba(201,168,76,0.06); }
+  .option-card-label {
+    display: inline-block; font-size: 10px; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 8px;
+  }
+  .option-card.selected .option-card-label { color: var(--accent); }
+  .option-card-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; letter-spacing: -0.01em; }
+  .option-card-desc { font-size: 12px; color: var(--muted2); line-height: 1.45; }
 
   /* BUTTONS */
-  .btn-row { display: flex; gap: 12px; align-items: center; }
+  .btn-row { display: flex; gap: 10px; align-items: center; }
   .btn {
     display: inline-flex; align-items: center; gap: 8px;
-    padding: 14px 28px; border-radius: 10px; font-size: 15px;
-    font-weight: 600; font-family: 'DM Sans', sans-serif;
-    cursor: pointer; border: none; transition: all 0.2s;
+    padding: 12px 24px; border-radius: 8px; font-size: 14px;
+    font-weight: 600; font-family: 'Inter', sans-serif;
+    cursor: pointer; border: none; transition: all 0.15s; letter-spacing: -0.01em;
   }
-  .btn-primary {
-    background: var(--accent); color: white;
-  }
-  .btn-primary:hover { background: #ff7050; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(255,92,53,0.3); }
-  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
-  .btn-ghost {
-    background: transparent; color: var(--muted);
-    border: 1px solid var(--border);
-  }
+  .btn-primary { background: linear-gradient(135deg, #c9a84c, #e8cc7a); color: #080e0a; }
+  .btn-primary:hover { background: #b8922e; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(201,168,76,0.25); }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+  .btn-ghost { background: transparent; color: var(--muted2); border: 1px solid var(--border); }
   .btn-ghost:hover { color: var(--text); border-color: var(--muted); }
-  .btn-big {
-    padding: 18px 40px; font-size: 17px; border-radius: 14px;
-    width: 100%; justify-content: center;
-  }
+  .btn-big { padding: 15px 36px; font-size: 15px; border-radius: 10px; width: 100%; justify-content: center; }
 
   /* LOADING */
-  .loading-screen {
-    padding: 80px 40px; text-align: center;
-    max-width: 600px; margin: 0 auto;
-  }
+  .loading-screen { padding: 80px 48px; text-align: center; max-width: 560px; margin: 0 auto; }
   .loader-ring {
-    width: 64px; height: 64px;
-    border: 3px solid var(--border);
+    width: 48px; height: 48px;
+    border: 2px solid var(--border);
     border-top-color: var(--accent);
     border-radius: 50%;
-    animation: spin 0.8s linear infinite;
+    animation: spin 0.75s linear infinite;
     margin: 0 auto 32px;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
-  .loading-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 24px; font-weight: 700; margin-bottom: 12px;
+  .loading-title { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; margin-bottom: 10px; }
+  .loading-subtitle { font-size: 14px; color: var(--muted2); line-height: 1.6; margin-bottom: 8px; }
+  .loading-warning {
+    font-size: 12px; color: var(--muted); margin-bottom: 36px;
+    padding: 10px 16px; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; display: inline-block;
   }
-  .loading-steps { display: flex; flex-direction: column; gap: 10px; margin-top: 32px; }
+  .loading-steps { display: flex; flex-direction: column; gap: 8px; }
   .loading-step {
-    display: flex; align-items: center; gap: 12px;
-    padding: 12px 20px; background: var(--surface);
-    border-radius: 10px; font-size: 14px; color: var(--muted);
-    animation: fadeIn 0.4s ease both;
+    display: flex; align-items: center; gap: 10px;
+    padding: 11px 16px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 8px;
+    font-size: 13px; color: var(--muted); animation: fadeIn 0.3s ease both;
+    transition: all 0.2s;
   }
-  .loading-step.done { color: var(--text); }
-  .loading-step.done .ls-icon { color: var(--success); }
-  .ls-icon { font-size: 16px; }
+  .loading-step.done { color: var(--text); border-color: rgba(39,196,100,0.2); }
+  .ls-check { width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--border); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 9px; }
+  .loading-step.done .ls-check { background: var(--success); border-color: var(--success); color: white; }
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
   /* RESULTS */
-  .results-wrap { max-width: 860px; margin: 0 auto; padding: 0 40px 100px; }
-  .results-header { margin-bottom: 40px; }
+  .results-wrap { max-width: 960px; margin: 0 auto; padding: 0 48px 100px; }
+  .results-header { margin-bottom: 44px; padding-top: 48px; }
   .results-tag {
-    display: inline-block; background: rgba(46,204,113,0.15);
-    color: var(--success); font-size: 12px; font-weight: 700;
+    display: inline-block; background: rgba(39,196,100,0.1);
+    color: var(--success); font-size: 11px; font-weight: 700;
     letter-spacing: 0.1em; text-transform: uppercase;
-    padding: 5px 12px; border-radius: 6px; margin-bottom: 16px;
+    padding: 4px 10px; border-radius: 4px; margin-bottom: 16px;
+    border: 1px solid rgba(39,196,100,0.2);
   }
-  .results-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 32px; font-weight: 800; margin-bottom: 8px;
-  }
-  .results-sub { color: var(--muted); font-size: 16px; }
-
-  .results-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; align-items: start; }
+  .results-title { font-family: 'Playfair Display', serif; font-size: 34px; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.02em; line-height: 1.15; }
+  .results-sub { color: var(--muted2); font-size: 14px; }
+  .results-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; align-items: start; }
 
   .section-card {
     background: var(--surface); border: 1px solid var(--border);
-    border-radius: 16px; padding: 28px; margin-bottom: 20px;
+    border-radius: 12px; padding: 24px; margin-bottom: 16px;
   }
   .section-card:last-child { margin-bottom: 0; }
-  .section-header {
-    display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
+  .section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+  .section-icon-box {
+    width: 30px; height: 30px; border-radius: 6px;
+    background: rgba(201,168,76,0.1); border: 1px solid rgba(201,168,76,0.15);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
   }
-  .section-icon {
-    width: 36px; height: 36px; border-radius: 8px;
-    background: rgba(255,92,53,0.15);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px;
-  }
-  .section-title {
-    font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700;
-  }
-  .section-content { font-size: 14px; line-height: 1.8; color: var(--muted); }
-  .section-content strong { color: var(--text); }
+  .section-icon-box svg { width: 14px; height: 14px; stroke: var(--accent); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .section-title { font-size: 14px; font-weight: 700; letter-spacing: -0.01em; }
 
-  .kv-list { display: flex; flex-direction: column; gap: 10px; }
-  .kv-row {
-    display: flex; justify-content: space-between; align-items: flex-start;
-    padding: 10px 0; border-bottom: 1px solid var(--border);
-    font-size: 14px; gap: 16px;
+  .doc-list { display: flex; flex-direction: column; gap: 0; }
+  .doc-field {
+    padding: 14px 0; border-bottom: 1px solid var(--border);
   }
-  .kv-row:last-child { border-bottom: none; }
-  .kv-key { color: var(--muted); flex-shrink: 0; }
-  .kv-val { color: var(--text); text-align: right; font-weight: 500; }
+  .doc-field:last-child { border-bottom: none; padding-bottom: 0; }
+  .doc-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--muted); margin-bottom: 6px;
+  }
+  .doc-value { font-size: 14px; color: var(--text); line-height: 1.65; }
 
-  .ad-examples { display: flex; flex-direction: column; gap: 12px; }
-  .ad-card {
-    background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 12px; padding: 16px;
-  }
-  .ad-card-label {
-    font-size: 10px; font-weight: 700; letter-spacing: 0.12em;
-    text-transform: uppercase; color: var(--accent); margin-bottom: 8px;
-  }
-  .ad-card-text { font-size: 14px; line-height: 1.7; color: var(--text); }
+  .ad-examples { display: flex; flex-direction: column; gap: 10px; }
+  .ad-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+  .ad-card-label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .ad-card-text { font-size: 13px; line-height: 1.7; color: var(--text); }
   .ad-card-cta {
     display: inline-block; margin-top: 10px;
-    background: var(--blue); color: white;
-    font-size: 12px; font-weight: 700;
-    padding: 5px 12px; border-radius: 6px;
+    background: #1877f2; color: white;
+    font-size: 11px; font-weight: 700; padding: 5px 12px; border-radius: 5px;
+    letter-spacing: 0.02em;
   }
 
   .warning-box {
-    background: rgba(255,92,53,0.08); border: 1px solid rgba(255,92,53,0.2);
-    border-radius: 12px; padding: 16px; margin-bottom: 20px;
-    font-size: 13px; color: var(--muted); line-height: 1.6;
+    background: rgba(245,158,11,0.06); border: 1px solid rgba(245,158,11,0.15);
+    border-radius: 8px; padding: 14px 16px; margin-bottom: 20px;
+    font-size: 13px; color: var(--muted2); line-height: 1.6;
   }
-  .warning-box strong { color: var(--accent); }
+  .warning-box strong { color: var(--warning); }
+
+  .info-box {
+    background: rgba(201,168,76,0.05); border: 1px solid rgba(201,168,76,0.1);
+    border-radius: 8px; padding: 14px 16px; margin-top: 16px;
+    font-size: 13px; color: var(--muted2); line-height: 1.6;
+  }
+  .info-box strong { color: var(--text); }
 
   .sidebar-sticky { position: sticky; top: 90px; }
-  .summary-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 16px; padding: 24px; margin-bottom: 20px;
-  }
-  .summary-title {
-    font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700;
-    margin-bottom: 16px; color: var(--muted); text-transform: uppercase;
-    letter-spacing: 0.08em;
-  }
+  .summary-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+  .summary-label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 16px; }
 
-  .checklist { display: flex; flex-direction: column; gap: 8px; }
-  .check-item {
-    display: flex; align-items: flex-start; gap: 10px;
-    font-size: 13px; color: var(--muted); line-height: 1.5;
-  }
-  .check-item::before { content: '○'; color: var(--border); flex-shrink: 0; margin-top: 1px; }
-  .check-item.done { color: var(--text); }
-  .check-item.done::before { content: '✓'; color: var(--success); }
+  .checklist { display: flex; flex-direction: column; gap: 10px; }
+  .check-item { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: var(--muted2); line-height: 1.5; }
+  .check-circle { width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--border); flex-shrink: 0; margin-top: 1px; }
 
-  .badge-row { display: flex; flex-wrap: wrap; gap: 8px; }
-  .badge {
-    background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 6px; padding: 4px 10px;
-    font-size: 12px; color: var(--muted);
+  .mistake-item {
+    display: flex; gap: 10px; padding: 11px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px; color: var(--muted2); line-height: 1.6;
   }
-  .badge.accent { background: rgba(255,92,53,0.1); border-color: rgba(255,92,53,0.2); color: var(--accent); }
+  .mistake-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .mistake-x { color: #ef4444; flex-shrink: 0; font-weight: 700; font-size: 12px; margin-top: 1px; }
+
+  .signal-item { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; color: var(--muted2); line-height: 1.55; }
+  .signal-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
 
   /* SETUP PAGE */
-  .setup-page { max-width: 760px; margin: 0 auto; padding: 60px 40px; }
-  .setup-steps { display: flex; flex-direction: column; gap: 2px; }
-  .setup-step {
-    display: flex; gap: 24px;
-    padding: 28px 0;
-    border-bottom: 1px solid var(--border);
-    animation: slideUp 0.4s ease both;
-  }
+  .setup-page { max-width: 720px; margin: 0 auto; padding: 60px 48px; }
+  .setup-steps { display: flex; flex-direction: column; }
+  .setup-step { display: flex; gap: 24px; padding: 28px 0; border-bottom: 1px solid var(--border); animation: fadeUp 0.3s ease both; }
   .setup-step:last-child { border-bottom: none; }
   .ss-num {
-    width: 40px; height: 40px; border-radius: 10px;
-    background: var(--accent); color: white;
-    font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800;
+    width: 36px; height: 36px; border-radius: 8px;
+    background: linear-gradient(135deg, #c9a84c, #e8cc7a); color: #080e0a;
+    font-size: 15px; font-weight: 700;
     display: flex; align-items: center; justify-content: center; flex-shrink: 0;
   }
   .ss-body { flex: 1; }
-  .ss-title {
-    font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700;
-    margin-bottom: 8px;
-  }
-  .ss-desc { font-size: 14px; color: var(--muted); line-height: 1.7; }
+  .ss-title { font-size: 17px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.01em; }
+  .ss-desc { font-size: 14px; color: var(--muted2); line-height: 1.7; }
   .ss-tip {
-    margin-top: 12px; padding: 12px 16px;
-    background: rgba(79,142,247,0.08); border: 1px solid rgba(79,142,247,0.15);
-    border-radius: 8px; font-size: 13px; color: #9ab8f7;
-    line-height: 1.5;
+    margin-top: 12px; padding: 11px 14px;
+    background: rgba(79,142,247,0.06); border: 1px solid rgba(79,142,247,0.12);
+    border-radius: 7px; font-size: 12px; color: #8ab4f8; line-height: 1.55;
   }
-  .ss-tip::before { content: '💡 '; }
+  .ss-tip::before { content: 'Note  —  '; font-weight: 600; }
 
-  /* UTIL */
-  .divider { height: 1px; background: var(--border); margin: 32px 0; }
-  .text-muted { color: var(--muted); }
-  .text-accent { color: var(--accent); }
-  .mt-8 { margin-top: 8px; }
-  .mt-16 { margin-top: 16px; }
-  .prose { font-size: 15px; line-height: 1.8; color: var(--muted); }
-  .prose strong { color: var(--text); }
-  .prose ul { padding-left: 20px; margin-top: 8px; }
-  .prose li { margin-bottom: 6px; }
+  /* DIVIDER */
+  .divider { height: 1px; background: var(--border); margin: 28px 0; }
 
-  @media (max-width: 680px) {
-    .nav { padding: 16px 20px; }
+  @media (max-width: 720px) {
+    .nav { padding: 14px 20px; }
     .hero, .wizard-wrap, .results-wrap, .setup-page { padding-left: 20px; padding-right: 20px; }
     .results-grid { grid-template-columns: 1fr; }
     .field-group.cols2 { grid-template-columns: 1fr; }
     .option-grid { grid-template-columns: 1fr; }
     .option-grid.cols3 { grid-template-columns: repeat(2, 1fr); }
     .sidebar-sticky { position: static; }
+    .kv-key { width: 100px; }
   }
 `;
 
-// ─── DATA ─────────────────────────────────────────────────────────────────────
+// SVG icons (no emojis)
+const Icon = ({ name }) => {
+  const icons = {
+    target: <><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></>,
+    users: <><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></>,
+    film: <><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></>,
+    edit: <><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></>,
+    globe: <><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></>,
+    zap: <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>,
+    chart: <><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></>,
+    alert: <><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></>,
+    image: <><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></>,
+    check: <polyline points="20 6 9 17 4 12"/>,
+  };
+  return <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">{icons[name]}</svg>;
+};
+
 const OFFER_TYPES = [
-  { id: "dtc_product", icon: "📦", title: "Physical Product", desc: "E-commerce / DTC sale, ships to customer" },
-  { id: "digital_product", icon: "💻", title: "Digital Product", desc: "Online course, ebook, software, SaaS" },
-  { id: "lead_gen_local", icon: "📍", title: "Local Service", desc: "Book calls/appointments for a local business" },
-  { id: "lead_gen_online", icon: "🌐", title: "Online Service / Coaching", desc: "Consultants, agencies, coaches — no geo limit" },
-  { id: "event", icon: "🎟️", title: "Event / Webinar", desc: "Registration for a live or virtual event" },
-  { id: "app", icon: "📱", title: "App Install", desc: "Drive downloads for a mobile app" },
+  { id: "dtc_product", label: "E-Commerce", title: "Physical Product", desc: "DTC sale, ships to customer" },
+  { id: "digital_product", label: "Digital", title: "Digital Product / SaaS", desc: "Course, ebook, software" },
+  { id: "lead_gen_local", label: "Local", title: "Local Service", desc: "Book calls for a local business" },
+  { id: "lead_gen_online", label: "Online", title: "Online Service / Coaching", desc: "Consultants, coaches, agencies" },
+  { id: "event", label: "Event", title: "Event / Webinar", desc: "Drive registrations" },
+  { id: "app", label: "App", title: "App Install", desc: "Drive mobile downloads" },
 ];
 
 const FUNNEL_STAGES = [
-  { id: "cold", icon: "❄️", title: "Cold — No awareness", desc: "Audience has never heard of you" },
-  { id: "warm", icon: "🔥", title: "Warm — Some awareness", desc: "Retargeting, email list, past visitors" },
-  { id: "hot", icon: "⚡", title: "Hot — Ready to buy", desc: "Cart abandoners, direct intent signals" },
+  { id: "cold", label: "Cold", title: "No awareness", desc: "Audience has never heard of you" },
+  { id: "warm", label: "Warm", title: "Some awareness", desc: "Retargeting, email list, past visitors" },
+  { id: "hot", label: "Hot", title: "Ready to buy", desc: "Cart abandoners, direct intent" },
 ];
 
 const SETUP_STEPS = [
-  {
-    num: 1, title: "Create a Facebook (Meta) Account",
-    desc: "Go to facebook.com and sign up, or log in to an existing personal account. Meta Ads requires a personal Facebook profile as the owner — you cannot run ads as just a business.",
-    tip: "Use a real name and real email. Fake accounts get banned before you spend a dollar."
-  },
-  {
-    num: 2, title: "Create a Facebook Business Page",
-    desc: "Go to facebook.com/pages/create. Choose 'Business or brand', fill in your business name, category, and add a profile photo and cover image. This is your public-facing brand presence on the platform.",
-    tip: "Even if you hate Facebook, your page needs to look real. Add a bio, a profile photo, and at least one post before running ads."
-  },
-  {
-    num: 3, title: "Set Up Meta Business Suite",
-    desc: "Go to business.facebook.com and create a Business account. This is your central dashboard — you'll manage your pages, ad accounts, pixels, and assets from here. Attach your Facebook Page.",
-    tip: "Do NOT skip this step and go straight to the Ads Manager. Business Suite is the proper layer above it."
-  },
-  {
-    num: 4, title: "Create Your Ad Account",
-    desc: "Inside Business Suite, go to Business Settings → Accounts → Ad Accounts → Add → Create New Ad Account. Name it, set your currency and time zone (you cannot change these later), and assign yourself admin access.",
-    tip: "Set your currency and timezone to what you actually use. A mismatch causes reporting headaches forever."
-  },
-  {
-    num: 5, title: "Add a Payment Method",
-    desc: "Go to Billing & Payments inside your Ad Account settings. Add a credit or debit card. Meta charges your card periodically as you spend — either when you hit your billing threshold or monthly, whichever comes first.",
-    tip: "Use a card with no international transaction fees if you can. Meta's billing entity is sometimes in Ireland and can trigger foreign transaction charges."
-  },
-  {
-    num: 6, title: "Install the Meta Pixel on Your Website",
-    desc: "In Events Manager (inside Business Suite), create a Pixel, then install it on your website. If you use Shopify, WordPress, or Webflow there are one-click integrations. Otherwise paste the base code into your site's <head> tag.",
-    tip: "Without the Pixel, you're flying blind. Meta cannot optimize for conversions if it can't see who converts. Install it before you spend a cent."
-  },
-  {
-    num: 7, title: "Verify Your Domain",
-    desc: "Go to Business Settings → Brand Safety → Domains. Add your domain and verify it via DNS record or HTML tag. This step became required after iOS 14 and unlocks conversion event tracking.",
-    tip: "This takes 10 minutes and you'll kick yourself if you skip it. Unverified domains get throttled conversion data."
-  },
-  {
-    num: 8, title: "Configure Your Pixel Events",
-    desc: "Back in Events Manager, set up the key events you want Meta to track: PageView, ViewContent, AddToCart, Purchase (for e-com) or Lead, CompleteRegistration (for lead gen). Use the Event Setup Tool for no-code setup or fire them manually via code.",
-    tip: "You can only optimize for events that have fired at least 50 times in the last 7 days. 'Purchase' is a tough cold-start — if you're new, optimize for a higher-funnel event like AddToCart while you build data."
-  },
-  {
-    num: 9, title: "Set Yourself Up in Ads Manager",
-    desc: "Go to adsmanager.facebook.com. Confirm your ad account is showing in the top left. Familiarise yourself with the three-layer structure: Campaign → Ad Set → Ad. You'll be spending most of your time at Ad Set (targeting, budget) and Ad (creative) level.",
-    tip: "You're now ready to build. Use the campaign plan from this tool and build it exactly as specified — don't freelance the settings until you have data."
-  },
+  { num: 1, title: "Create a Facebook Account", desc: "Go to facebook.com and sign up or log in. Meta Ads requires a personal Facebook profile as the owner — you cannot run ads as a business alone.", tip: "Use a real name and real email. Fake accounts get banned before you spend a dollar." },
+  { num: 2, title: "Create a Facebook Business Page", desc: "Go to facebook.com/pages/create. Choose Business or Brand, fill in your business name, category, and add a profile photo and cover image.", tip: "Your page needs to look real. Add a bio, a profile photo, and at least one post before running ads." },
+  { num: 3, title: "Set Up Meta Business Suite", desc: "Go to business.facebook.com and create a Business account. This is your central dashboard — you'll manage pages, ad accounts, pixels, and assets from here.", tip: "Do not skip this and go straight to Ads Manager. Business Suite is the proper layer above it." },
+  { num: 4, title: "Create Your Ad Account", desc: "Inside Business Suite, go to Business Settings → Accounts → Ad Accounts → Add → Create New Ad Account. Set your currency and time zone — you cannot change these later.", tip: "Set your currency and timezone correctly. A mismatch causes reporting headaches forever." },
+  { num: 5, title: "Add a Payment Method", desc: "Go to Billing and Payments inside your Ad Account settings. Add a credit or debit card. Meta charges your card when you hit your billing threshold or monthly, whichever comes first.", tip: "Use a card with no international transaction fees if you can. Meta's billing entity is sometimes in Ireland." },
+  { num: 6, title: "Install the Meta Pixel", desc: "In Events Manager inside Business Suite, create a Pixel and install it on your website. Shopify, WordPress, and Webflow have one-click integrations. Otherwise paste the base code into your site's head tag.", tip: "Without the Pixel you are flying blind. Meta cannot optimise for conversions if it cannot see who converts. Install it before you spend anything." },
+  { num: 7, title: "Verify Your Domain", desc: "Go to Business Settings → Brand Safety → Domains. Add and verify your domain via DNS record or HTML tag. This step became required after iOS 14 and unlocks conversion event tracking.", tip: "This takes 10 minutes and you will regret skipping it. Unverified domains get throttled conversion data." },
+  { num: 8, title: "Configure Your Pixel Events", desc: "In Events Manager, set up the key events you want Meta to track: PageView, ViewContent, AddToCart, Purchase for e-commerce — or Lead and CompleteRegistration for lead gen. Use the Event Setup Tool for a no-code setup.", tip: "You can only optimise for events that have fired at least 50 times in 7 days. If you're new, start by optimising for a higher-funnel event like AddToCart while you build data." },
+  { num: 9, title: "You're Ready to Build", desc: "Go to adsmanager.facebook.com. Confirm your ad account appears top left. Familiarise yourself with the three-layer structure: Campaign, Ad Set, Ad. You'll spend most time at Ad Set (targeting, budget) and Ad (creative) level.", tip: "Build the campaign exactly as specified in your plan. Do not freelance the settings until you have real data." },
 ];
 
-// ─── CAMPAIGN PROMPT ──────────────────────────────────────────────────────────
 function buildPrompt(data) {
   return `You are a senior Meta Ads strategist with 10+ years experience managing campaigns across DTC, lead gen, SaaS, and local businesses. You give specific, opinionated, tactical advice — not generic tips. You know the platform deeply: algorithm behaviour, auction dynamics, creative best practices, and common beginner traps.
 
@@ -490,16 +407,16 @@ Generate a comprehensive, highly specific campaign plan. Be opinionated — tell
   },
   "pixelAndTracking": {
     "keyEvent": "The single conversion event to optimize for given their budget and offer",
-    "whyThisEvent": "Why this event specifically — explain the 50-events-per-week rule if relevant",
+    "whyThisEvent": "Why this event specifically",
     "utmAdvice": "UTM parameter setup"
   },
   "expectations": {
     "realisticCPL": "Realistic cost per lead OR cost per purchase for their offer/budget",
     "learningPhase": "How long and how many results before they have real data",
-    "whenToKill": "Specific signal to kill an ad set that isn't working",
-    "whenToScale": "Specific signal they've found a winner"
+    "whenToKill": "Specific signal to kill an ad set that is not working",
+    "whenToScale": "Specific signal they have found a winner"
   },
-  "commonMistakes": ["3-4 specific mistakes people make with this exact offer type / budget range — be specific, not generic"],
+  "commonMistakes": ["3-4 specific mistakes people make with this exact offer type and budget range"],
   "week1Checklist": ["6-8 specific action items to complete before or on launch day"],
   "visualBrief": {
     "concept": "Describe a specific visual/video concept for their top ad",
@@ -509,12 +426,11 @@ Generate a comprehensive, highly specific campaign plan. Be opinionated — tell
   }
 }
 
-Be extremely specific to their offer, budget, and situation. Do not give generic advice. If their budget is under $1,000/month, adjust your advice accordingly — don't recommend strategies that require $5k/month to work. Respond ONLY with the JSON object, no markdown, no preamble.`;
+Be extremely specific to their offer, budget, and situation. Do not give generic advice. If their budget is under $1,000/month, adjust your advice accordingly. Respond ONLY with the JSON object, no markdown, no preamble.`;
 }
 
-// ─── COMPONENT ────────────────────────────────────────────────────────────────
-export default function MetaAdsMVP() {
-  const [page, setPage] = useState("home"); // home | setup | wizard | loading | results
+export default function AdPlanPro() {
+  const [page, setPage] = useState("home");
   const [step, setStep] = useState(0);
   const [form, setForm] = useState({
     offerType: "", businessName: "", offerDesc: "", budget: "",
@@ -523,22 +439,23 @@ export default function MetaAdsMVP() {
   });
   const [result, setResult] = useState(null);
   const [loadingStep, setLoadingStep] = useState(0);
+
   const loadingSteps = [
-    "Analysing your offer type and budget...",
-    "Building campaign structure...",
-    "Generating targeting recommendations...",
-    "Writing ad copy examples...",
-    "Finalising your creative brief...",
-    "Campaign plan ready ✓",
+    "Analysing your offer type and budget",
+    "Building campaign structure",
+    "Generating targeting recommendations",
+    "Writing ad copy examples",
+    "Finalising your creative brief",
+    "Campaign plan ready",
   ];
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
   const STEPS = [
-    { label: "Step 1 of 4", title: "Tell us about your offer", desc: "This shapes everything — campaign type, targeting, creative." },
-    { label: "Step 2 of 4", title: "Budget & pricing", desc: "Be honest — we'll build a realistic plan for what you have." },
+    { label: "Step 1 of 4", title: "Tell us about your offer", desc: "This shapes everything — campaign type, targeting, and creative direction." },
+    { label: "Step 2 of 4", title: "Budget and pricing", desc: "Be honest here. We'll build a realistic plan for what you actually have." },
     { label: "Step 3 of 4", title: "Your audience", desc: "Who actually buys this, and where are they?" },
-    { label: "Step 4 of 4", title: "Context & goals", desc: "Last few details to make your plan specific." },
+    { label: "Step 4 of 4", title: "Context and goals", desc: "A few final details to make your plan as specific as possible." },
   ];
 
   const canNext = [
@@ -552,8 +469,8 @@ export default function MetaAdsMVP() {
     setPage("loading");
     setLoadingStep(0);
     const interval = setInterval(() => {
-      setLoadingStep(s => Math.min(s + 1, loadingSteps.length - 1));
-    }, 900);
+      setLoadingStep(s => Math.min(s + 1, loadingSteps.length - 2));
+    }, 1200);
 
     try {
       const response = await fetch("https://adplan-api-production.up.railway.app/generate", {
@@ -565,18 +482,16 @@ export default function MetaAdsMVP() {
       });
       const data = await response.json();
       const text = data.content?.find(b => b.type === "text")?.text || "";
-console.log("Raw response:", text.slice(0, 300));
-const clean = text.replace(/```json\n?|```\n?/g, "").trim();let parsed;
-try {
-  parsed = JSON.parse(clean);
-} catch(parseErr) {
-  console.log("Parse error:", parseErr.message);
-  console.log("Full text:", text);
-  throw parseErr;
-}
+      const clean = text.replace(/```json\n?|```\n?/g, "").trim();
+      let parsed;
+      try {
+        parsed = JSON.parse(clean);
+      } catch(e) {
+        throw new Error("Failed to parse response");
+      }
       clearInterval(interval);
       setLoadingStep(loadingSteps.length - 1);
-      setTimeout(() => { setResult(parsed); setPage("results"); }, 800);
+      setTimeout(() => { setResult(parsed); setPage("results"); }, 600);
     } catch (e) {
       clearInterval(interval);
       setResult({ error: true });
@@ -584,7 +499,6 @@ try {
     }
   }
 
-  // ── STYLES ──
   useEffect(() => {
     const el = document.createElement("style");
     el.textContent = css;
@@ -592,47 +506,54 @@ try {
     return () => el.remove();
   }, []);
 
-  // ── HOME PAGE ──
+  const resetAll = () => {
+    setPage("home"); setStep(0); setResult(null);
+    setForm({ offerType: "", businessName: "", offerDesc: "", budget: "", pricePoint: "", location: "", targetAudience: "", funnelStage: "", existingAssets: "", goal: "" });
+  };
+
+  // HOME
   if (page === "home") return (
     <div className="app">
       <nav className="nav">
-        <div className="nav-logo">⚡ AdPlan<span>Pro</span> <span className="nav-pill">BETA</span></div>
+        <div className="nav-logo"><div className="nav-logo-dot"/> AdPlan Pro <span className="nav-pill">Beta</span></div>
         <div className="nav-tabs">
           <button className="nav-tab active">Build Campaign</button>
           <button className="nav-tab" onClick={() => setPage("setup")}>Account Setup</button>
         </div>
       </nav>
       <div className="hero">
-        <div className="hero-eyebrow">Meta Ads · Built by Experts</div>
+        <div className="hero-eyebrow">Meta Ads — Built by Practitioners</div>
         <h1>Run ads like you've been doing it <em>for years.</em></h1>
-        <p>Answer 10 questions. Get a full, expert-level Meta campaign plan — targeting, budget, creative, copy, and more.</p>
+        <p>Answer 10 questions. Get a complete, expert-level Meta campaign plan — targeting, budget, copy, creative direction, and more.</p>
         <div className="hero-price">
           <strong>$5 per campaign plan</strong>
-          <span className="price-badge">EARLY ACCESS PRICE</span>
-          <span>· cancel anytime</span>
+          <span className="price-badge">Early Access</span>
+          <span>No subscription</span>
         </div>
         <div style={{ marginTop: 40 }}>
-          <button className="btn btn-primary btn-big" style={{ maxWidth: 360, margin: "0 auto" }} onClick={() => setPage("wizard")}>
-            Build My Campaign Plan →
+          <button className="btn btn-primary btn-big" style={{ maxWidth: 340, margin: "0 auto" }} onClick={() => setPage("wizard")}>
+            Build My Campaign Plan
           </button>
           <p style={{ textAlign: "center", marginTop: 14, fontSize: 13, color: "var(--muted)" }}>
-            Never run ads before? <button onClick={() => setPage("setup")} style={{ background: "none", border: "none", color: "var(--accent)", cursor: "pointer", fontSize: 13, fontFamily: "inherit" }}>Set up your account first →</button>
+            New to Meta ads?{" "}
+            <button onClick={() => setPage("setup")} style={{ background: "none", border: "none", color: "var(--accent)", cursor: "pointer", fontSize: 13, fontFamily: "inherit", fontWeight: 500 }}>
+              Set up your account first
+            </button>
           </p>
         </div>
       </div>
 
-      {/* FEATURE STRIP */}
-      <div style={{ maxWidth: 860, margin: "0 auto 80px", padding: "0 40px" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
+      <div style={{ maxWidth: 880, margin: "0 auto 80px", padding: "0 48px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14 }}>
           {[
-            { icon: "🎯", t: "Targeting Strategy", d: "Broad vs interest-based, Advantage+ guidance, audience sizing — explained for your budget." },
-            { icon: "✍️", t: "Copy & Creative Brief", d: "Hooks, primary text, CTAs, and a visual concept brief — ready to hand to a designer." },
-            { icon: "📊", t: "Realistic Expectations", d: "What CPL / ROAS to expect, when to kill an ad, when to scale — no fluff." },
+            { icon: "target", title: "Targeting Strategy", desc: "Broad vs interest-based, Advantage+ guidance, audience sizing — calibrated for your exact budget." },
+            { icon: "edit", title: "Copy and Creative Brief", desc: "Hooks, primary text, CTAs, and a visual concept brief ready to hand to a designer or creator." },
+            { icon: "chart", title: "Realistic Benchmarks", desc: "Expected CPL or ROAS, when to kill an ad set, when to scale — no generic ranges." },
           ].map(f => (
-            <div key={f.t} className="section-card" style={{ marginBottom: 0 }}>
-              <div style={{ fontSize: 28, marginBottom: 12 }}>{f.icon}</div>
-              <div style={{ fontFamily: "Syne, sans-serif", fontWeight: 700, fontSize: 15, marginBottom: 8 }}>{f.t}</div>
-              <div style={{ fontSize: 13, color: "var(--muted)", lineHeight: 1.6 }}>{f.d}</div>
+            <div key={f.title} className="section-card" style={{ marginBottom: 0 }}>
+              <div className="section-icon-box" style={{ marginBottom: 14 }}><Icon name={f.icon} /></div>
+              <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 6, letterSpacing: "-0.01em" }}>{f.title}</div>
+              <div style={{ fontSize: 13, color: "var(--muted2)", lineHeight: 1.6 }}>{f.desc}</div>
             </div>
           ))}
         </div>
@@ -640,11 +561,11 @@ try {
     </div>
   );
 
-  // ── SETUP PAGE ──
+  // SETUP
   if (page === "setup") return (
     <div className="app">
       <nav className="nav">
-        <div className="nav-logo">⚡ AdPlan<span>Pro</span> <span className="nav-pill">BETA</span></div>
+        <div className="nav-logo"><div className="nav-logo-dot"/> AdPlan Pro <span className="nav-pill">Beta</span></div>
         <div className="nav-tabs">
           <button className="nav-tab" onClick={() => setPage("home")}>Build Campaign</button>
           <button className="nav-tab active">Account Setup</button>
@@ -653,12 +574,12 @@ try {
       <div className="setup-page">
         <div style={{ marginBottom: 48 }}>
           <div className="hero-eyebrow">Before You Run Ads</div>
-          <h2 style={{ fontFamily: "Syne, sans-serif", fontSize: 36, fontWeight: 800, marginBottom: 12 }}>Set Up Your Meta Ad Account</h2>
-          <p className="prose">Complete every step below before building your first campaign. Skipping steps — especially Pixel and domain verification — will cost you real money in wasted ad spend.</p>
+          <h2 style={{ fontFamily: "Playfair Display, serif", fontSize: 36, fontWeight: 800, marginBottom: 12, letterSpacing: "-0.02em" }}>Set Up Your Meta Ad Account</h2>
+          <p style={{ fontSize: 15, color: "var(--muted2)", lineHeight: 1.7, maxWidth: 560 }}>Complete every step below before building your first campaign. Skipping steps — especially Pixel and domain verification — will cost you real money in wasted ad spend.</p>
         </div>
         <div className="setup-steps">
           {SETUP_STEPS.map((s, i) => (
-            <div key={s.num} className="setup-step" style={{ animationDelay: `${i * 0.07}s` }}>
+            <div key={s.num} className="setup-step" style={{ animationDelay: `${i * 0.06}s` }}>
               <div className="ss-num">{s.num}</div>
               <div className="ss-body">
                 <div className="ss-title">{s.title}</div>
@@ -669,35 +590,33 @@ try {
           ))}
         </div>
         <div style={{ marginTop: 48 }}>
-          <button className="btn btn-primary btn-big" style={{ maxWidth: 400 }} onClick={() => setPage("wizard")}>
-            Account Ready — Build My Campaign →
+          <button className="btn btn-primary btn-big" style={{ maxWidth: 380 }} onClick={() => setPage("wizard")}>
+            Account Ready — Build My Campaign
           </button>
         </div>
       </div>
     </div>
   );
 
-  // ── WIZARD ──
+  // WIZARD
   if (page === "wizard") return (
     <div className="app">
       <nav className="nav">
-        <div className="nav-logo">⚡ AdPlan<span>Pro</span> <span className="nav-pill">BETA</span></div>
+        <div className="nav-logo"><div className="nav-logo-dot"/> AdPlan Pro <span className="nav-pill">Beta</span></div>
         <div className="nav-tabs">
-          <button className="nav-tab" onClick={() => setPage("home")}>Home</button>
+          <button className="nav-tab" onClick={resetAll}>Home</button>
           <button className="nav-tab" onClick={() => setPage("setup")}>Account Setup</button>
         </div>
       </nav>
       <div className="wizard-wrap" style={{ paddingTop: 48 }}>
-
-        {/* Step indicator */}
         <div className="step-indicator">
           {[0,1,2,3].map((i) => (
-            <>
-              <div key={`dot-${i}`} className={`step-dot ${i < step ? "done" : i === step ? "active" : ""}`}>
-                {i < step ? "✓" : i + 1}
+            <div key={i} style={{ display: "contents" }}>
+              <div className={`step-dot ${i < step ? "done" : i === step ? "active" : ""}`}>
+                {i < step ? <Icon name="check" /> : i + 1}
               </div>
-              {i < 3 && <div key={`line-${i}`} className={`step-line ${i < step ? "done" : ""}`} />}
-            </>
+              {i < 3 && <div className={`step-line ${i < step ? "done" : ""}`} />}
+            </div>
           ))}
         </div>
 
@@ -706,13 +625,12 @@ try {
           <div className="step-title">{STEPS[step].title}</div>
           <div className="step-desc">{STEPS[step].desc}</div>
 
-          {/* STEP 0 */}
           {step === 0 && <>
-            <div style={{ marginBottom: 12, fontSize: 13, color: "var(--muted)", fontWeight: 600 }}>What type of offer are you running?</div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: "var(--muted2)", marginBottom: 10, letterSpacing: "0.02em" }}>What type of offer are you running?</div>
             <div className="option-grid" style={{ marginBottom: 28 }}>
               {OFFER_TYPES.map(o => (
                 <div key={o.id} className={`option-card ${form.offerType === o.id ? "selected" : ""}`} onClick={() => set("offerType", o.id)}>
-                  <div className="option-card-icon">{o.icon}</div>
+                  <div className="option-card-label">{o.label}</div>
                   <div className="option-card-title">{o.title}</div>
                   <div className="option-card-desc">{o.desc}</div>
                 </div>
@@ -725,12 +643,11 @@ try {
               </div>
               <div className="field">
                 <label>Describe your offer in 1-2 sentences</label>
-                <textarea placeholder="e.g. We offer residential cleaning services in Austin, TX. First-time customers get 20% off their first clean." value={form.offerDesc} onChange={e => set("offerDesc", e.target.value)} />
+                <textarea placeholder="e.g. Residential cleaning in Austin TX. First-time customers get 20% off." value={form.offerDesc} onChange={e => set("offerDesc", e.target.value)} />
               </div>
             </div>
           </>}
 
-          {/* STEP 1 */}
           {step === 1 && <>
             <div className="field-group cols2">
               <div className="field">
@@ -743,17 +660,16 @@ try {
               </div>
             </div>
             <div className="warning-box">
-              <strong>Honest truth about $500/month:</strong> Meta's algorithm needs data to optimise. At lower budgets, expect a 2-4 week learning period where results look rough. Don't panic-kill your ads before you have 50+ events. We'll factor your budget into every recommendation.
+              <strong>On smaller budgets:</strong> Meta's algorithm needs data to optimise. Expect a 2-4 week learning period where results look rough. Don't panic-kill ads before you have 50+ events. Your plan will account for this.
             </div>
           </>}
 
-          {/* STEP 2 */}
           {step === 2 && <>
-            <div style={{ marginBottom: 12, fontSize: 13, color: "var(--muted)", fontWeight: 600 }}>Where is this audience in their journey?</div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: "var(--muted2)", marginBottom: 10, letterSpacing: "0.02em" }}>Where is this audience in their journey?</div>
             <div className="option-grid cols3" style={{ marginBottom: 28 }}>
               {FUNNEL_STAGES.map(s => (
                 <div key={s.id} className={`option-card ${form.funnelStage === s.id ? "selected" : ""}`} onClick={() => set("funnelStage", s.id)}>
-                  <div className="option-card-icon">{s.icon}</div>
+                  <div className="option-card-label">{s.label}</div>
                   <div className="option-card-title">{s.title}</div>
                   <div className="option-card-desc">{s.desc}</div>
                 </div>
@@ -761,21 +677,20 @@ try {
             </div>
             <div className="field-group">
               <div className="field">
-                <label>Who is your ideal customer? (age, interests, job, situation)</label>
-                <textarea placeholder="e.g. Women 28-45 in Austin TX, homeowners with kids, too busy to clean, household income $80k+. They care about trusted, vetted cleaners." value={form.targetAudience} onChange={e => set("targetAudience", e.target.value)} />
+                <label>Who is your ideal customer?</label>
+                <textarea placeholder="e.g. Women 28-45 in Austin TX, homeowners with kids, too busy to clean, household income $80k+." value={form.targetAudience} onChange={e => set("targetAudience", e.target.value)} />
               </div>
               <div className="field">
-                <label>Target Location (city, region, or national)</label>
+                <label>Target Location</label>
                 <input placeholder="e.g. Austin, TX — 25 mile radius" value={form.location} onChange={e => set("location", e.target.value)} />
               </div>
             </div>
           </>}
 
-          {/* STEP 3 */}
           {step === 3 && <>
             <div className="field-group">
               <div className="field">
-                <label>What's your main campaign goal?</label>
+                <label>Main campaign goal</label>
                 <select value={form.goal} onChange={e => set("goal", e.target.value)}>
                   <option value="">Select...</option>
                   <option value="Generate leads (form fills / calls)">Generate leads (form fills / calls)</option>
@@ -786,20 +701,20 @@ try {
                 </select>
               </div>
               <div className="field">
-                <label>Existing assets? (optional but important)</label>
-                <textarea placeholder="e.g. I have a website with ~200 visitors/month, an email list of 400 people, never run Meta ads before. OR: I've run ads before, have a pixel with ~300 events." value={form.existingAssets} onChange={e => set("existingAssets", e.target.value)} />
+                <label>Existing assets — optional but important</label>
+                <textarea placeholder="e.g. Website with 200 visitors/month, email list of 400, no prior Meta ads. Or: pixel with 300 events, ran ads 6 months ago." value={form.existingAssets} onChange={e => set("existingAssets", e.target.value)} />
               </div>
             </div>
-            <div className="warning-box">
-              <strong>You're about to generate your campaign plan.</strong> Our AI has been trained on thousands of real Meta campaigns. The output is specific to your offer, budget, and situation — not generic advice.
+            <div className="info-box">
+              <strong>You're about to generate your plan.</strong> The output is specific to your offer, budget, and situation — not generic advice.
             </div>
           </>}
 
-          <div className="btn-row">
-            {step > 0 && <button className="btn btn-ghost" onClick={() => setStep(s => s - 1)}>← Back</button>}
+          <div className="btn-row" style={{ marginTop: 28 }}>
+            {step > 0 && <button className="btn btn-ghost" onClick={() => setStep(s => s - 1)}>Back</button>}
             {step < 3
-              ? <button className="btn btn-primary" disabled={!canNext} onClick={() => setStep(s => s + 1)}>Continue →</button>
-              : <button className="btn btn-primary" style={{ flex: 1, justifyContent: "center" }} onClick={generate}>Generate My Campaign Plan ⚡</button>
+              ? <button className="btn btn-primary" disabled={!canNext} onClick={() => setStep(s => s + 1)}>Continue</button>
+              : <button className="btn btn-primary" style={{ flex: 1, justifyContent: "center" }} onClick={generate}>Generate Campaign Plan</button>
             }
           </div>
         </div>
@@ -807,20 +722,21 @@ try {
     </div>
   );
 
-  // ── LOADING ──
+  // LOADING
   if (page === "loading") return (
     <div className="app">
       <nav className="nav">
-        <div className="nav-logo">⚡ AdPlan<span>Pro</span> <span className="nav-pill">BETA</span></div>
+        <div className="nav-logo"><div className="nav-logo-dot"/> AdPlan Pro <span className="nav-pill">Beta</span></div>
       </nav>
       <div className="loading-screen">
         <div className="loader-ring" />
         <div className="loading-title">Building your campaign plan...</div>
-        <p className="text-muted">Analysing your offer, budget, and audience against what's working on Meta right now.</p>
+        <div className="loading-subtitle">Analysing your offer, budget, and audience against current Meta best practices.</div>
+        <div className="loading-warning">Please do not refresh or close this page</div>
         <div className="loading-steps">
           {loadingSteps.map((s, i) => (
-            <div key={i} className={`loading-step ${i <= loadingStep ? "done" : ""}`} style={{ animationDelay: `${i * 0.2}s` }}>
-              <span className="ls-icon">{i <= loadingStep ? "✓" : "○"}</span>
+            <div key={i} className={`loading-step ${i <= loadingStep ? "done" : ""}`} style={{ animationDelay: `${i * 0.15}s` }}>
+              <div className="ls-check">{i <= loadingStep ? "✓" : ""}</div>
               {s}
             </div>
           ))}
@@ -829,101 +745,88 @@ try {
     </div>
   );
 
-  // ── RESULTS ──
+  // RESULTS
   if (page === "results") {
     if (!result || result.error) return (
       <div className="app">
-        <nav className="nav">
-          <div className="nav-logo">⚡ AdPlan<span>Pro</span></div>
-        </nav>
-        <div style={{ textAlign: "center", padding: 80 }}>
-          <div style={{ fontSize: 48, marginBottom: 16 }}>⚠️</div>
-          <div style={{ fontFamily: "Syne, sans-serif", fontSize: 24, fontWeight: 700, marginBottom: 12 }}>Something went wrong</div>
-          <p style={{ color: "var(--muted)", marginBottom: 32 }}>We couldn't generate your plan. Please try again.</p>
+        <nav className="nav"><div className="nav-logo"><div className="nav-logo-dot"/> AdPlan Pro</div></nav>
+        <div style={{ textAlign: "center", padding: "80px 40px" }}>
+          <div style={{ width: 48, height: 48, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" }}>
+            <Icon name="alert" />
+          </div>
+          <div style={{ fontFamily: "Playfair Display, serif", fontSize: 24, fontWeight: 700, marginBottom: 10 }}>Something went wrong</div>
+          <p style={{ color: "var(--muted2)", marginBottom: 32, fontSize: 14 }}>We could not generate your plan. Please try again.</p>
           <button className="btn btn-primary" onClick={() => { setPage("wizard"); setStep(0); }}>Try Again</button>
         </div>
       </div>
     );
 
     const r = result;
+    const SectionCard = ({ icon, title, children }) => (
+      <div className="section-card">
+        <div className="section-header">
+          <div className="section-icon-box"><Icon name={icon} /></div>
+          <div className="section-title">{title}</div>
+        </div>
+        {children}
+      </div>
+    );
+
     return (
       <div className="app">
         <nav className="nav">
-          <div className="nav-logo">⚡ AdPlan<span>Pro</span> <span className="nav-pill">BETA</span></div>
+          <div className="nav-logo"><div className="nav-logo-dot"/> AdPlan Pro <span className="nav-pill">Beta</span></div>
           <div className="nav-tabs">
-            <button className="nav-tab" onClick={() => { setPage("home"); setStep(0); setResult(null); }}>← New Campaign</button>
+            <button className="nav-tab" onClick={resetAll}>New Campaign</button>
             <button className="nav-tab" onClick={() => setPage("setup")}>Account Setup</button>
           </div>
         </nav>
-        <div className="results-wrap" style={{ paddingTop: 48 }}>
+        <div className="results-wrap">
           <div className="results-header">
-            <div className="results-tag">✓ Campaign Plan Ready</div>
+            <div className="results-tag">Campaign Plan Ready</div>
             <div className="results-title">{form.businessName} — Meta Ads Campaign Plan</div>
-            <div className="results-sub">{form.offerType.replace(/_/g, " ")} · ${form.budget}/mo budget · {form.location || "National"}</div>
+            <div className="results-sub">{form.offerType.replace(/_/g, " ")} &middot; ${form.budget}/mo &middot; {form.location || "National"}</div>
           </div>
 
           <div className="results-grid">
-            {/* LEFT COL */}
             <div>
-              {/* Campaign Strategy */}
-              <div className="section-card">
-                <div className="section-header">
-                  <div className="section-icon">🎯</div>
-                  <div className="section-title">Campaign Strategy</div>
+              <SectionCard icon="target" title="Campaign Strategy">
+                <div className="doc-list">
+                  <div className="doc-field"><div className="doc-label">Objective</div><div className="doc-value">{r.campaignStrategy?.objective}</div></div>
+                  <div className="doc-field"><div className="doc-label">Budget Strategy</div><div className="doc-value">{r.campaignStrategy?.budgetStrategy}</div></div>
+                  <div className="doc-field"><div className="doc-label">Bid Strategy</div><div className="doc-value">{r.campaignStrategy?.bidStrategy}</div></div>
                 </div>
-                <div className="kv-list">
-                  <div className="kv-row"><span className="kv-key">Objective</span><span className="kv-val">{r.campaignStrategy?.objective}</span></div>
-                  <div className="kv-row"><span className="kv-key">Budget Strategy</span><span className="kv-val">{r.campaignStrategy?.budgetStrategy}</span></div>
-                  <div className="kv-row"><span className="kv-key">Bid Strategy</span><span className="kv-val">{r.campaignStrategy?.bidStrategy}</span></div>
-                </div>
-                {r.campaignStrategy?.warmupAdvice && (
-                  <div className="ss-tip" style={{ marginTop: 16 }}>{r.campaignStrategy.warmupAdvice}</div>
-                )}
-              </div>
+                {r.campaignStrategy?.warmupAdvice && <div className="info-box" style={{ marginTop: 16 }}>{r.campaignStrategy.warmupAdvice}</div>}
+              </SectionCard>
 
-              {/* Targeting */}
-              <div className="section-card">
-                <div className="section-header">
-                  <div className="section-icon">👥</div>
-                  <div className="section-title">Targeting Settings</div>
+              <SectionCard icon="users" title="Targeting Settings">
+                <div className="doc-list">
+                  <div className="doc-field"><div className="doc-label">Approach</div><div className="doc-value">{r.targeting?.audienceApproach}</div></div>
+                  <div className="doc-field"><div className="doc-label">Primary Audience</div><div className="doc-value">{r.targeting?.primaryAudience}</div></div>
+                  <div className="doc-field"><div className="doc-label">Advantage+ Audience</div><div className="doc-value">{r.targeting?.broadWarning}</div></div>
+                  <div className="doc-field"><div className="doc-label">Geography</div><div className="doc-value">{r.targeting?.geographicSettings}</div></div>
+                  <div className="doc-field"><div className="doc-label">Audience Size</div><div className="doc-value">{r.targeting?.audienceSizeAdvice}</div></div>
                 </div>
-                <div className="kv-list">
-                  <div className="kv-row"><span className="kv-key">Approach</span><span className="kv-val">{r.targeting?.audienceApproach}</span></div>
-                  <div className="kv-row"><span className="kv-key">Primary Audience</span><span className="kv-val">{r.targeting?.primaryAudience}</span></div>
-                  <div className="kv-row"><span className="kv-key">Advantage+</span><span className="kv-val">{r.targeting?.broadWarning}</span></div>
-                  <div className="kv-row"><span className="kv-key">Geography</span><span className="kv-val">{r.targeting?.geographicSettings}</span></div>
-                  <div className="kv-row"><span className="kv-key">Audience Size</span><span className="kv-val">{r.targeting?.audienceSizeAdvice}</span></div>
-                </div>
-              </div>
+              </SectionCard>
 
-              {/* Creative */}
-              <div className="section-card">
-                <div className="section-header">
-                  <div className="section-icon">🎬</div>
-                  <div className="section-title">Ad Creative Direction</div>
+              <SectionCard icon="film" title="Ad Creative Direction">
+                <div className="doc-list">
+                  <div className="doc-field"><div className="doc-label">Top Format</div><div className="doc-value">{r.adCreative?.topFormat}</div></div>
+                  <div className="doc-field"><div className="doc-label">Secondary Test</div><div className="doc-value">{r.adCreative?.secondaryFormat}</div></div>
+                  <div className="doc-field"><div className="doc-label">Hook Strategy</div><div className="doc-value">{r.adCreative?.hookStrategy}</div></div>
+                  <div className="doc-field"><div className="doc-label">How Many Creatives</div><div className="doc-value">{r.adCreative?.creativeCount}</div></div>
+                  <div className="doc-field"><div className="doc-label">Video vs Static</div><div className="doc-value">{r.adCreative?.videoVsStatic}</div></div>
                 </div>
-                <div className="kv-list">
-                  <div className="kv-row"><span className="kv-key">Top Format</span><span className="kv-val">{r.adCreative?.topFormat}</span></div>
-                  <div className="kv-row"><span className="kv-key">Secondary Test</span><span className="kv-val">{r.adCreative?.secondaryFormat}</span></div>
-                  <div className="kv-row"><span className="kv-key">Hook Strategy</span><span className="kv-val">{r.adCreative?.hookStrategy}</span></div>
-                  <div className="kv-row"><span className="kv-key">How Many Creatives</span><span className="kv-val">{r.adCreative?.creativeCount}</span></div>
-                  <div className="kv-row"><span className="kv-key">Video vs Static</span><span className="kv-val">{r.adCreative?.videoVsStatic}</span></div>
-                </div>
-              </div>
+              </SectionCard>
 
-              {/* Copy */}
-              <div className="section-card">
-                <div className="section-header">
-                  <div className="section-icon">✍️</div>
-                  <div className="section-title">Ad Copy Examples</div>
-                </div>
-                <div className="section-content" style={{ marginBottom: 16 }}>
-                  <strong>Lead angle:</strong> {r.copyFramework?.primaryAngle}
+              <SectionCard icon="edit" title="Ad Copy Examples">
+                <div style={{ fontSize: 13, color: "var(--muted2)", marginBottom: 14 }}>
+                  Lead angle: <span style={{ color: "var(--text)" }}>{r.copyFramework?.primaryAngle}</span>
                 </div>
                 <div className="ad-examples">
                   <div className="ad-card">
                     <div className="ad-card-label">Headline</div>
-                    <div className="ad-card-text" style={{ fontWeight: 700, fontSize: 16 }}>{r.copyFramework?.headline}</div>
+                    <div className="ad-card-text" style={{ fontWeight: 600, fontSize: 15 }}>{r.copyFramework?.headline}</div>
                   </div>
                   <div className="ad-card">
                     <div className="ad-card-label">Primary Text</div>
@@ -931,100 +834,94 @@ try {
                     <div className="ad-card-cta">{r.copyFramework?.cta}</div>
                   </div>
                 </div>
-              </div>
+              </SectionCard>
 
-              {/* Visual Brief */}
-              <div className="section-card">
-                <div className="section-header">
-                  <div className="section-icon">🖼️</div>
-                  <div className="section-title">Visual / Creative Brief</div>
+              <SectionCard icon="image" title="Visual / Creative Brief">
+                <div className="doc-list">
+                  <div className="doc-field"><div className="doc-label">Concept</div><div className="doc-value">{r.visualBrief?.concept}</div></div>
+                  <div className="doc-field"><div className="doc-label">Visual Style</div><div className="doc-value">{r.visualBrief?.style}</div></div>
+                  <div className="doc-field"><div className="doc-label">Text Overlay</div><div className="doc-value">{r.visualBrief?.textOverlay}</div></div>
+                  <div className="doc-field"><div className="doc-label">Thumbnail</div><div className="doc-value">{r.visualBrief?.thumbnailAdvice}</div></div>
                 </div>
-                <div className="kv-list">
-                  <div className="kv-row"><span className="kv-key">Concept</span><span className="kv-val">{r.visualBrief?.concept}</span></div>
-                  <div className="kv-row"><span className="kv-key">Style</span><span className="kv-val">{r.visualBrief?.style}</span></div>
-                  <div className="kv-row"><span className="kv-key">Text Overlay</span><span className="kv-val">{r.visualBrief?.textOverlay}</span></div>
-                  <div className="kv-row"><span className="kv-key">Thumbnail</span><span className="kv-val">{r.visualBrief?.thumbnailAdvice}</span></div>
-                </div>
-              </div>
+              </SectionCard>
 
-              {/* Landing Page */}
-              <div className="section-card">
-                <div className="section-header">
-                  <div className="section-icon">🌐</div>
-                  <div className="section-title">Landing Page & Tracking</div>
+              <SectionCard icon="globe" title="Landing Page and Tracking">
+                <div className="doc-list">
+                  <div className="doc-field"><div className="doc-label">Page Type</div><div className="doc-value">{r.landingPage?.pageType}</div></div>
+                  <div className="doc-field"><div className="doc-label">Must-Haves</div><div className="doc-value">{r.landingPage?.mustHaves}</div></div>
+                  <div className="doc-field"><div className="doc-label">Mobile</div><div className="doc-value">{r.landingPage?.mobileWarning}</div></div>
+                  <div className="doc-field"><div className="doc-label">Optimise For</div><div className="doc-value">{r.pixelAndTracking?.keyEvent}</div></div>
+                  <div className="doc-field"><div className="doc-label">Why This Event</div><div className="doc-value">{r.pixelAndTracking?.whyThisEvent}</div></div>
+                  <div className="doc-field"><div className="doc-label">UTM Setup</div><div className="doc-value">{r.pixelAndTracking?.utmAdvice}</div></div>
                 </div>
-                <div className="kv-list">
-                  <div className="kv-row"><span className="kv-key">Page Type</span><span className="kv-val">{r.landingPage?.pageType}</span></div>
-                  <div className="kv-row"><span className="kv-key">Must-Haves</span><span className="kv-val">{r.landingPage?.mustHaves}</span></div>
-                  <div className="kv-row"><span className="kv-key">Mobile Warning</span><span className="kv-val">{r.landingPage?.mobileWarning}</span></div>
-                  <div className="kv-row"><span className="kv-key">Optimise For</span><span className="kv-val">{r.pixelAndTracking?.keyEvent}</span></div>
-                  <div className="kv-row"><span className="kv-key">Why</span><span className="kv-val">{r.pixelAndTracking?.whyThisEvent}</span></div>
-                  <div className="kv-row"><span className="kv-key">UTMs</span><span className="kv-val">{r.pixelAndTracking?.utmAdvice}</span></div>
-                </div>
-              </div>
+              </SectionCard>
 
-              {/* Expectations */}
-              <div className="section-card">
-                <div className="section-header">
-                  <div className="section-icon">📊</div>
-                  <div className="section-title">Realistic Expectations</div>
+              <SectionCard icon="chart" title="Realistic Expectations">
+                <div className="doc-list">
+                  <div className="doc-field"><div className="doc-label">Expected CPL / CPA</div><div className="doc-value">{r.expectations?.realisticCPL}</div></div>
+                  <div className="doc-field"><div className="doc-label">Learning Phase</div><div className="doc-value">{r.expectations?.learningPhase}</div></div>
                 </div>
-                <div className="kv-list">
-                  <div className="kv-row"><span className="kv-key">Expected CPL / CPA</span><span className="kv-val">{r.expectations?.realisticCPL}</span></div>
-                  <div className="kv-row"><span className="kv-key">Learning Phase</span><span className="kv-val">{r.expectations?.learningPhase}</span></div>
-                  <div className="kv-row"><span className="kv-key">Kill signal</span><span className="kv-val" style={{ color: "#ff6b6b" }}>{r.expectations?.whenToKill}</span></div>
-                  <div className="kv-row"><span className="kv-key">Scale signal</span><span className="kv-val" style={{ color: "var(--success)" }}>{r.expectations?.whenToScale}</span></div>
+                <div style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 10 }}>
+                  <div className="signal-item">
+                    <div className="signal-dot" style={{ background: "#ef4444" }} />
+                    <span><strong style={{ color: "var(--text)", fontSize: 12 }}>Kill signal —</strong> {r.expectations?.whenToKill}</span>
+                  </div>
+                  <div className="signal-item">
+                    <div className="signal-dot" style={{ background: "var(--success)" }} />
+                    <span><strong style={{ color: "var(--text)", fontSize: 12 }}>Scale signal —</strong> {r.expectations?.whenToScale}</span>
+                  </div>
                 </div>
-              </div>
+              </SectionCard>
 
-              {/* Mistakes */}
-              <div className="section-card">
-                <div className="section-header">
-                  <div className="section-icon">⚠️</div>
-                  <div className="section-title">Common Mistakes to Avoid</div>
-                </div>
-                <div className="checklist">
+              <SectionCard icon="alert" title="Common Mistakes to Avoid">
+                <div>
                   {(r.commonMistakes || []).map((m, i) => (
-                    <div key={i} style={{ display: "flex", gap: 12, padding: "10px 0", borderBottom: i < r.commonMistakes.length - 1 ? "1px solid var(--border)" : "none", fontSize: 14, color: "var(--muted)", lineHeight: 1.6 }}>
-                      <span style={{ color: "#ff6b6b", flexShrink: 0 }}>✕</span>
+                    <div key={i} className="mistake-item">
+                      <span className="mistake-x">✕</span>
                       {m}
                     </div>
                   ))}
                 </div>
-              </div>
+              </SectionCard>
             </div>
 
-            {/* RIGHT SIDEBAR */}
+            {/* SIDEBAR */}
             <div className="sidebar-sticky">
               <div className="summary-card">
-                <div className="summary-title">Campaign Summary</div>
-                <div className="kv-list">
-                  <div className="kv-row"><span className="kv-key">Business</span><span className="kv-val">{form.businessName}</span></div>
-                  <div className="kv-row"><span className="kv-key">Monthly Budget</span><span className="kv-val" style={{ color: "var(--accent)" }}>${form.budget}</span></div>
-                  <div className="kv-row"><span className="kv-key">Price Point</span><span className="kv-val">${form.pricePoint}</span></div>
-                  <div className="kv-row"><span className="kv-key">Location</span><span className="kv-val">{form.location || "National"}</span></div>
-                  <div className="kv-row"><span className="kv-key">Funnel Stage</span><span className="kv-val">{form.funnelStage}</span></div>
+                <div className="summary-label">Campaign Summary</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+                  {[
+                    { label: "Business", val: form.businessName },
+                    { label: "Monthly Budget", val: `$${form.budget}/mo`, gold: true },
+                    { label: "Price Point", val: `$${form.pricePoint}` },
+                    { label: "Location", val: form.location || "National" },
+                    { label: "Funnel Stage", val: form.funnelStage },
+                  ].map((item, i) => (
+                    <div key={i} style={{ padding: "10px 0", borderBottom: "1px solid var(--border)" }}>
+                      <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--muted)", marginBottom: 3 }}>{item.label}</div>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: item.gold ? "var(--accent)" : "var(--text)", textTransform: item.label === "Funnel Stage" ? "capitalize" : "none" }}>{item.val}</div>
+                    </div>
+                  ))}
                 </div>
               </div>
 
               <div className="summary-card">
-                <div className="summary-title">Launch Checklist</div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                <div className="summary-label">Launch Checklist</div>
+                <div className="checklist">
                   {(r.week1Checklist || []).map((item, i) => (
-                    <div key={i} style={{ display: "flex", gap: 10, fontSize: 13, color: "var(--muted)", lineHeight: 1.5 }}>
-                      <span style={{ color: "var(--border)", flexShrink: 0 }}>○</span>
+                    <div key={i} className="check-item">
+                      <div className="check-circle" />
                       {item}
                     </div>
                   ))}
                 </div>
               </div>
 
-              <button className="btn btn-primary" style={{ width: "100%", justifyContent: "center", marginBottom: 12 }}
-                onClick={() => { setPage("wizard"); setStep(0); setResult(null); setForm({ offerType: "", businessName: "", offerDesc: "", budget: "", pricePoint: "", location: "", targetAudience: "", funnelStage: "", existingAssets: "", goal: "" }); }}>
-                + New Campaign
+              <button className="btn btn-primary btn-big" onClick={resetAll} style={{ marginBottom: 10 }}>
+                New Campaign
               </button>
-              <button className="btn btn-ghost" style={{ width: "100%", justifyContent: "center" }} onClick={() => window.print()}>
-                🖨️ Print / Save PDF
+              <button className="btn btn-ghost btn-big" onClick={() => window.print()}>
+                Print / Save PDF
               </button>
             </div>
           </div>
