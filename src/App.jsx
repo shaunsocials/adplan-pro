@@ -533,7 +533,7 @@ export default function AdPlanPro() {
       });
       const data = await response.json();
       const text = data.content?.find(b => b.type === "text")?.text || "";
-      const jsonPattern = /```json\n?|```\n?/g; const clean = text.replace(jsonPattern, "").trim();
+      const stripCodeBlocks = (s) => s.replace(/```json/g, "").replace(/```/g, "").trim(); const clean = stripCodeBlocks(text);
       let parsed;
       try {
         parsed = JSON.parse(clean);
