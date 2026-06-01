@@ -533,7 +533,7 @@ export default function AdPlanPro() {
       });
       const data = await response.json();
       const text = data.content?.find(b => b.type === "text")?.text || "";
-      const clean = text.replace(/```json\n?|```\n?/g, "").trim();
+      const jsonPattern = /```json\n?|```\n?/g; const clean = text.replace(jsonPattern, "").trim();
       let parsed;
       try {
         parsed = JSON.parse(clean);
@@ -576,9 +576,7 @@ export default function AdPlanPro() {
         setForm(savedForm);
         localStorage.removeItem("metplan_form");
         // Small delay to let state settle then generate
-        setForm(savedForm);
-setPage("loading");
-setTimeout(() => generateWithForm(savedForm), 100);
+        setTimeout(() => generate(savedForm), 100);
       }
     }
   }, []);
