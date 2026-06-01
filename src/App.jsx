@@ -576,7 +576,9 @@ export default function AdPlanPro() {
         setForm(savedForm);
         localStorage.removeItem("metplan_form");
         // Small delay to let state settle then generate
-        setTimeout(() => generate(savedForm), 100);
+        setForm(savedForm);
+setPage("loading");
+setTimeout(() => generateWithForm(savedForm), 100);
       }
     }
   }, []);
