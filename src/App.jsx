@@ -119,6 +119,32 @@ Generate a comprehensive, highly specific campaign plan. Be opinionated — tell
 Be extremely specific to their offer, budget, and situation. Do not give generic advice. If their budget is under $1,000/month, adjust your advice accordingly. Respond ONLY with the JSON object, no markdown, no preamble.`;
 }
 
+function SectionCard({ icon, title, children }) {
+  return (
+    <div className="section-card">
+      <div className="section-header">
+        <div className="section-icon-box"><Icon name={icon} /></div>
+        <div className="section-title">{title}</div>
+      </div>
+      {children}
+    </div>
+  );
+}
+
+
+function Footer({ onTerms, onPrivacy }) {
+  return (
+    <footer className="site-footer">
+      <div className="footer-copy">© {new Date().getFullYear()} MetPlan. All rights reserved.</div>
+      <div className="footer-links">
+        <button className="footer-link" onClick={onTerms}>Terms of Service</button>
+        <button className="footer-link" onClick={onPrivacy}>Privacy Policy</button>
+      </div>
+    </footer>
+  );
+}
+
+
 export default function AdPlanPro() {
   const [page, setPage] = useState("home");
   const [step, setStep] = useState(0);
@@ -299,7 +325,7 @@ export default function AdPlanPro() {
           ))}
         </div>
       </div>
-      <Footer />
+      <Footer onTerms={() => setPage('terms')} onPrivacy={() => setPage('privacy')} />
     </div>
   );
 
@@ -337,7 +363,7 @@ export default function AdPlanPro() {
           </button>
         </div>
       </div>
-      <Footer />
+      <Footer onTerms={() => setPage('terms')} onPrivacy={() => setPage('privacy')} />
     </div>
   );
 
@@ -589,15 +615,7 @@ export default function AdPlanPro() {
     );
 
     const r = result;
-    const SectionCard = ({ icon, title, children }) => (
-      <div className="section-card">
-        <div className="section-header">
-          <div className="section-icon-box"><Icon name={icon} /></div>
-          <div className="section-title">{title}</div>
-        </div>
-        {children}
-      </div>
-    );
+
 
     return (
       <div className="app">
@@ -758,16 +776,7 @@ export default function AdPlanPro() {
   }
 
 
-  // FOOTER COMPONENT
-  const Footer = () => (
-    <footer className="site-footer">
-      <div className="footer-copy">© {new Date().getFullYear()} MetPlan. All rights reserved.</div>
-      <div className="footer-links">
-        <button className="footer-link" onClick={() => setPage("terms")}>Terms of Service</button>
-        <button className="footer-link" onClick={() => setPage("privacy")}>Privacy Policy</button>
-      </div>
-    </footer>
-  );
+
 
   // TERMS OF SERVICE
   if (page === "terms") return (
@@ -831,7 +840,7 @@ export default function AdPlanPro() {
         <h2>11. Contact</h2>
         <p>For questions about these Terms, contact us at <a href="mailto:support@metplan.net">support@metplan.net</a>.</p>
       </div>
-      <Footer />
+      <Footer onTerms={() => setPage('terms')} onPrivacy={() => setPage('privacy')} />
     </div>
   );
 
