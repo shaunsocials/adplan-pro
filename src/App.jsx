@@ -288,7 +288,7 @@ export default function AdPlanPro() {
           <button className="nav-tab" onClick={() => setPage("setup")}>Account Setup</button>
         </div>
       </nav>
-      <div className="hero">
+      <div className="hero" style={{ overflowX: "hidden" }}>
         <div className="hero-eyebrow">Meta Ads — Built by Practitioners</div>
         <h1>Run ads like you've been doing it <em>for years.</em></h1>
         <p>Answer 10 questions. Get a complete, expert-level Meta campaign plan — targeting, budget, copy, creative direction, and more.</p>
@@ -311,7 +311,7 @@ export default function AdPlanPro() {
       </div>
 
       <div style={{ maxWidth: 880, margin: "0 auto 80px", padding: "0 48px" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14 }}>
+        <div className="home-features" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14 }}>
           {[
             { icon: "target", title: "Targeting Strategy", desc: "Broad vs interest-based, Advantage+ guidance, audience sizing — calibrated for your exact budget." },
             { icon: "edit", title: "Copy and Creative Brief", desc: "Hooks, primary text, CTAs, and a visual concept brief ready to hand to a designer or creator." },
