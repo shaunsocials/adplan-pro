@@ -85,10 +85,11 @@ Generate a comprehensive, highly specific campaign plan. Be opinionated — tell
     "videoVsStatic": "Specific recommendation for their situation"
   },
   "copyFramework": {
-    "primaryAngle": "The main psychological angle / pain point to lead with",
-    "headline": "Example headline they could use (specific to their offer)",
-    "primaryText": "Example primary text / ad copy (3-4 sentences, specific to their offer)",
-    "cta": "Exact CTA button to use and why"
+    "primaryAngle": "The main psychological angle / pain point to lead with — 1-2 sentences explaining the emotional driver",
+    "headline": "Write an actual ready-to-use headline for their ad (under 40 chars, punchy, specific to their offer — NOT a description of what a headline should do)",
+    "primaryText": "Write actual ready-to-use primary text for their ad (3-5 sentences, written in first or second person, specific hook to their offer, ends with a soft CTA — NOT a description of what copy should do)",
+    "description": "Write an actual ready-to-use description line for their ad (1-2 sentences, supports the headline, specific to their offer)",
+    "cta": "The exact Meta CTA button to select from the dropdown (e.g. 'Learn More', 'Get Quote', 'Sign Up', 'Shop Now', 'Book Now') and one sentence explaining why this CTA over others"
   },
   "landingPage": {
     "pageType": "What type of landing page / destination to send traffic to",
@@ -116,7 +117,7 @@ Generate a comprehensive, highly specific campaign plan. Be opinionated — tell
   }
 }
 
-Be extremely specific to their offer, budget, and situation. Do not give generic advice. If their budget is under $1,000/month, adjust your advice accordingly. Respond ONLY with the JSON object, no markdown, no preamble.`;
+Be extremely specific to their offer, budget, and situation. Do not give generic advice. If their budget is under $1,000/month, adjust your advice accordingly. CRITICAL: For copyFramework, write actual ready-to-use ad copy — real headlines, real body text, real descriptions — not descriptions of what copy should contain. The user should be able to copy and paste directly into Meta Ads Manager. Respond ONLY with the JSON object, no markdown, no preamble.`;
 }
 
 function SectionCard({ icon, title, children }) {
@@ -671,12 +672,26 @@ export default function AdPlanPro() {
                 <div className="ad-examples">
                   <div className="ad-card">
                     <div className="ad-card-label">Headline</div>
-                    <div className="ad-card-text" style={{ fontWeight: 600, fontSize: 15 }}>{r.copyFramework?.headline}</div>
+                    <div className="ad-card-text" style={{ fontWeight: 700, fontSize: 16, letterSpacing: "-0.01em" }}>{r.copyFramework?.headline}</div>
                   </div>
                   <div className="ad-card">
                     <div className="ad-card-label">Primary Text</div>
-                    <div className="ad-card-text">{r.copyFramework?.primaryText}</div>
-                    <div className="ad-card-cta">{r.copyFramework?.cta}</div>
+                    <div className="ad-card-text" style={{ whiteSpace: "pre-line" }}>{r.copyFramework?.primaryText}</div>
+                  </div>
+                  {r.copyFramework?.description && (
+                    <div className="ad-card">
+                      <div className="ad-card-label">Description</div>
+                      <div className="ad-card-text">{r.copyFramework.description}</div>
+                    </div>
+                  )}
+                  <div className="ad-card" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
+                    <div>
+                      <div className="ad-card-label">CTA Button</div>
+                      <div className="ad-card-text" style={{ fontSize: 12, color: "var(--muted2)", marginTop: 4 }}>{r.copyFramework?.cta}</div>
+                    </div>
+                    <div className="ad-card-cta" style={{ flexShrink: 0 }}>
+                      {r.copyFramework?.cta?.split("'")[1] || r.copyFramework?.cta?.split('"')[1] || "Learn More"}
+                    </div>
                   </div>
                 </div>
               </SectionCard>
