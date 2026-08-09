@@ -136,7 +136,21 @@ function SectionCard({ icon, title, children }) {
 function Footer({ onTerms, onPrivacy }) {
   return (
     <footer className="site-footer">
-      <div className="footer-copy">© {new Date().getFullYear()} MetPlan. All rights reserved.</div>
+      <div className="footer-left">
+        <div className="footer-copy">© {new Date().getFullYear()} MetPlan. All rights reserved.</div>
+        <div className="footer-built">
+          Built by{" "}
+          
+            href="https://notoriouscreativeagency.com"
+            className="footer-built-link"
+            target="_blank"
+            rel="noopener"
+          >
+            Notorious Creative
+          </a>
+          {" "}— client acquisition systems for high-ticket service businesses.
+        </div>
+      </div>
       <div className="footer-links">
         <button className="footer-link" onClick={onTerms}>Terms of Service</button>
         <button className="footer-link" onClick={onPrivacy}>Privacy Policy</button>
