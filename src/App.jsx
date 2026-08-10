@@ -140,7 +140,7 @@ function Footer({ onTerms, onPrivacy }) {
         <div className="footer-copy">© {new Date().getFullYear()} MetPlan. All rights reserved.</div>
         <div className="footer-built">
           Built by{" "}
-          
+          <a
             href="https://notoriouscreativeagency.com"
             className="footer-built-link"
             target="_blank"
